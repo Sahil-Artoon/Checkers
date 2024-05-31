@@ -1,0 +1,6 @@
+const SOCKET_EVENT_NAME = {
+    POP_UP:'POP_UP',
+    SIGN_UP:'SIGN_UP'
+}
+
+export {SOCKET_EVENT_NAME}
