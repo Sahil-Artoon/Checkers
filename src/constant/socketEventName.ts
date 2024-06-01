@@ -1,6 +1,7 @@
 const SOCKET_EVENT_NAME = {
-    POP_UP:'POP_UP',
-    SIGN_UP:'SIGN_UP'
+    POP_UP: 'POP_UP',
+    SIGN_UP: 'SIGN_UP',
+    JOIN_TABLE: "JOIN_TABLE"
 }
 
-export {SOCKET_EVENT_NAME}
+export { SOCKET_EVENT_NAME }

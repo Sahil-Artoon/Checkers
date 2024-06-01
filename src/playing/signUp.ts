@@ -31,21 +31,27 @@ const signUp = async (data: any, socket: any) => {
             isBot,
             tableId: ""
         }
-        await redisSet(`${REDIS_EVENT_NAME.USER}:${_id}`, JSON.stringify(data))
+        logger.info(`signUp Data ${data}`)
+        console.log("Sign Up", data)
+        await redisSet(`${REDIS_EVENT_NAME.USER}:${_id}`, data)
         let User: any = await redisGet(`${REDIS_EVENT_NAME.USER}:${_id}`);
         User = JSON.parse(User)
-        console.log("User :::: ", User)
-        data = {
-            eventName: SOCKET_EVENT_NAME.SIGN_UP,
-            data: {
-                User,
-                message: "ok"
-            },
-            socket
+        if (isBot == true) {
+            return User
         }
-        sendToSocketIdEmmiter(data)
-        logger.info(`END signUp :::: ${JSON.stringify(data.data)}`)
-        return;
+        if (isBot == false) {
+            data = {
+                eventName: SOCKET_EVENT_NAME.SIGN_UP,
+                data: {
+                    User,
+                    message: "ok"
+                },
+                socket
+            }
+            sendToSocketIdEmmiter(data)
+            logger.info(`END signUp :::: ${JSON.stringify(data.data)}`)
+            return;
+        }
     } catch (error) {
         logger.error(`CATCH_ERROR signUp :::: ${error}`)
     }

@@ -28,13 +28,36 @@ document.getElementById('join-table-form').addEventListener('submit', (event) =>
 
 document.getElementById('play-with-bot').addEventListener('click', (event) => {
     event.preventDefault();
-    document.getElementById('section-2').style.display = "none"
-    document.getElementById('section-3').style.display = "block"
+    let User = getSession('USER');
+    console.log("User :::: ", User)
+    data = {
+        eventName: "JOIN_TABLE",
+        data: {
+            _id: User._id,
+            userName: User.userName,
+            isBot: User.isBot,
+            playWithBot: true
+        }
+    }
+    sendEmmiter(data);
+    return;
 })
 document.getElementById('play-with-player').addEventListener('click', (event) => {
     event.preventDefault();
-    document.getElementById('section-2').style.display = "none"
-    document.getElementById('section-3').style.display = "block"
+    let User = getSession('USER');
+    data = {
+        eventName: "JOIN_TABLE",
+        data: {
+            _id: User._id,
+            userName: User.userName,
+            isBot: User.isBot,
+            playWithBot: false
+        }
+    }
+    sendEmmiter(data);
+    return;
+    // document.getElementById('section-2').style.display = "none"
+    // document.getElementById('section-3').style.display = "block"
 })
 
 
@@ -47,10 +70,25 @@ const popUp = (data) => {
 const signUp = (data) => {
     console.log(`signUp :::: DATA :::: ${JSON.stringify(data)}`)
     if (data.message == "ok") {
+        data = {
+            _id: data.User._id,
+            userName: data.User.userName,
+            isBot: data.User.isBot
+        }
+        setUserSession("USER", data, 60)
         document.getElementById('section-1').style.display = "none"
         document.getElementById('section-2').style.display = "block"
     } else {
         alert(data.message)
+    }
+}
+
+const joinTable = (data) => {
+    console.log(`joinTable :::: DATA :::: ${JSON.stringify(data)}`)
+    if (data.message == "ok") {
+        setUserSession("USER_TABLE", data.tableData, 60)
+        document.getElementById('section-2').style.display = "none"
+        document.getElementById('section-3').style.display = "block"
     }
 }
 
@@ -60,7 +98,7 @@ const sendEmmiter = (data) => {
 }
 
 socket.onAny((eventName, data) => {
-    console.log(`EventName IS:::${eventName} and Data is ${JSON.stringify(data)}`)
+    console.log(`EventName IS::: ${eventName} and Data is ${JSON.stringify(data)}`)
     switch (eventName) {
         case "POP_UP":
             popUp(data)
@@ -68,6 +106,10 @@ socket.onAny((eventName, data) => {
 
         case "SIGN_UP":
             signUp(data)
+            break;
+
+        case "JOIN_TABLE":
+            joinTable(data)
             break;
     }
 })
