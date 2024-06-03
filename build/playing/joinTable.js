@@ -1,124 +1,134 @@
-import { signUpBot } from "../bot/signUpBot"
-import { joinBotQueue } from "../bull/Queue/joinBotQueue"
-import { generateId } from "../common/generateId"
-import { BULL_TIMER } from "../constant/bullTimer"
-import { GAME_STATUS } from "../constant/gameStatus"
-import { REDIS_EVENT_NAME } from "../constant/redisConstant"
-import { SOCKET_EVENT_NAME } from "../constant/socketEventName"
-import { sendToSocketIdEmmiter } from "../eventEmmitter"
-import { logger } from "../logger"
-import { redisDel, redisGet, redisSet } from "../redisOption"
-import { joinTableValidation } from "../validation/joinTableValidation"
-
-const joinTable = async (data: any, socket: any) => {
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.joinTable = void 0;
+const joinBotQueue_1 = require("../bull/Queue/joinBotQueue");
+const generateId_1 = require("../common/generateId");
+const bullTimer_1 = require("../constant/bullTimer");
+const gameStatus_1 = require("../constant/gameStatus");
+const redisConstant_1 = require("../constant/redisConstant");
+const socketEventName_1 = require("../constant/socketEventName");
+const eventEmmitter_1 = require("../eventEmmitter");
+const logger_1 = require("../logger");
+const redisOption_1 = require("../redisOption");
+const joinTableValidation_1 = require("../validation/joinTableValidation");
+const joinTable = (data, socket) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        logger.info(`START joinTable :::: DATA :::: ${JSON.stringify(data)}`)
-        let checkData: any = await joinTableValidation(data)
-        if (checkData?.error) {
+        logger_1.logger.info(`START joinTable :::: DATA :::: ${JSON.stringify(data)}`);
+        let checkData = yield (0, joinTableValidation_1.joinTableValidation)(data);
+        if (checkData === null || checkData === void 0 ? void 0 : checkData.error) {
             data = {
-                eventName: SOCKET_EVENT_NAME.POP_UP,
+                eventName: socketEventName_1.SOCKET_EVENT_NAME.POP_UP,
                 data: {
                     message: checkData.error.details[0].message
                 },
                 socket
-            }
-            sendToSocketIdEmmiter(data)
-            logger.info(`END joinTable :::: ${JSON.stringify(data.data)}`)
+            };
+            (0, eventEmmitter_1.sendToSocketIdEmmiter)(data);
+            logger_1.logger.info(`END joinTable :::: ${JSON.stringify(data.data)}`);
             return;
         }
-
-        let { _id, userName, isBot, playWithBot, tableId } = data
-
-        let findUser: any = await redisGet(`${REDIS_EVENT_NAME.USER}:${_id}`)
-        findUser = JSON.parse(findUser)
-
+        let { _id, userName, isBot, playWithBot, tableId } = data;
+        let findUser = yield (0, redisOption_1.redisGet)(`${redisConstant_1.REDIS_EVENT_NAME.USER}:${_id}`);
+        findUser = JSON.parse(findUser);
         if (!findUser) {
             data = {
-                eventName: SOCKET_EVENT_NAME.POP_UP,
+                eventName: socketEventName_1.SOCKET_EVENT_NAME.POP_UP,
                 data: {
                     message: `Can't found User By _id.`
                 },
                 socket
-            }
-            sendToSocketIdEmmiter(data)
-            logger.info(`END joinTable :::: ${JSON.stringify(data.data)}`)
+            };
+            (0, eventEmmitter_1.sendToSocketIdEmmiter)(data);
+            logger_1.logger.info(`END joinTable :::: ${JSON.stringify(data.data)}`);
             return;
         }
         if (tableId) {
-            console.log(":::::::::::::::::::::::::::::::")
-            console.log("Inside Table Id ")
-            console.log(":::::::::::::::::::::::::::::::")
-            let findTable: any = await redisGet(`${REDIS_EVENT_NAME.TABLE}:${tableId}`)
-            findTable = JSON.parse(findTable)
+            console.log(":::::::::::::::::::::::::::::::");
+            console.log("Inside Table Id ");
+            console.log(":::::::::::::::::::::::::::::::");
+            let findTable = yield (0, redisOption_1.redisGet)(`${redisConstant_1.REDIS_EVENT_NAME.TABLE}:${tableId}`);
+            findTable = JSON.parse(findTable);
             if (findTable) {
                 findTable.playerInfo.push({
                     userId: _id,
                     userName,
                     isBot,
                     isActive: true
-                })
+                });
                 findTable.activePlayer = findTable.activePlayer + 1;
-                await redisDel(`${REDIS_EVENT_NAME.TABLE}: ${findTable._id}`)
-                await redisSet(`${REDIS_EVENT_NAME.TABLE}:${findTable._id}`, findTable)
-                findTable = await redisGet(`${REDIS_EVENT_NAME.TABLE}:${findTable._id}`)
-                findTable = JSON.parse(findTable)
-                logger.info(`END joinTable PlayWithBot :::: ${JSON.stringify(findTable)}`)
+                yield (0, redisOption_1.redisDel)(`${redisConstant_1.REDIS_EVENT_NAME.TABLE}: ${findTable._id}`);
+                yield (0, redisOption_1.redisSet)(`${redisConstant_1.REDIS_EVENT_NAME.TABLE}:${findTable._id}`, findTable);
+                findTable = yield (0, redisOption_1.redisGet)(`${redisConstant_1.REDIS_EVENT_NAME.TABLE}:${findTable._id}`);
+                findTable = JSON.parse(findTable);
+                logger_1.logger.info(`END joinTable PlayWithBot :::: ${JSON.stringify(findTable)}`);
                 return;
             }
-        } else {
-            let findtableByQueue: any = await redisGet(REDIS_EVENT_NAME.QUEUE)
-            findtableByQueue = JSON.parse(findtableByQueue)
+        }
+        else {
+            let findtableByQueue = yield (0, redisOption_1.redisGet)(redisConstant_1.REDIS_EVENT_NAME.QUEUE);
+            findtableByQueue = JSON.parse(findtableByQueue);
             if (playWithBot == true)
-                findtableByQueue = false
+                findtableByQueue = false;
             if (findtableByQueue) {
-                console.log("FINDTABLEBYQUEUE :::: ", findtableByQueue)
-                let idOfTable: any;
+                console.log("FINDTABLEBYQUEUE :::: ", findtableByQueue);
+                let idOfTable;
                 if (findtableByQueue.length == 1) {
-                    idOfTable = findtableByQueue[0]
-                    await redisDel(REDIS_EVENT_NAME.QUEUE)
-                } else {
-                    idOfTable = findtableByQueue[findtableByQueue.length - 1];
-                    await redisDel(REDIS_EVENT_NAME.QUEUE)
-                    findtableByQueue.pop()
-                    await redisSet(REDIS_EVENT_NAME.QUEUE, findtableByQueue)
+                    idOfTable = findtableByQueue[0];
+                    yield (0, redisOption_1.redisDel)(redisConstant_1.REDIS_EVENT_NAME.QUEUE);
                 }
-                let findTable: any = await redisGet(`${REDIS_EVENT_NAME.TABLE}:${idOfTable}`)
-                findTable = JSON.parse(findTable)
+                else {
+                    idOfTable = findtableByQueue[findtableByQueue.length - 1];
+                    yield (0, redisOption_1.redisDel)(redisConstant_1.REDIS_EVENT_NAME.QUEUE);
+                    findtableByQueue.pop();
+                    yield (0, redisOption_1.redisSet)(redisConstant_1.REDIS_EVENT_NAME.QUEUE, findtableByQueue);
+                }
+                let findTable = yield (0, redisOption_1.redisGet)(`${redisConstant_1.REDIS_EVENT_NAME.TABLE}:${idOfTable}`);
+                findTable = JSON.parse(findTable);
                 if (findTable) {
                     findTable.playerInfo.push({
                         userId: _id,
                         userName,
                         isBot,
                         isActive: true
-                    })
+                    });
                     findTable.activePlayer = findTable.activePlayer + 1;
-                    await redisDel(`${REDIS_EVENT_NAME.TABLE}: ${findTable._id}`)
-                    await redisSet(`${REDIS_EVENT_NAME.TABLE}:${findTable._id}`, findTable)
-                    findTable = await redisGet(`${REDIS_EVENT_NAME.TABLE}:${findTable._id}`)
-                    findTable = JSON.parse(findTable)
+                    yield (0, redisOption_1.redisDel)(`${redisConstant_1.REDIS_EVENT_NAME.TABLE}: ${findTable._id}`);
+                    yield (0, redisOption_1.redisSet)(`${redisConstant_1.REDIS_EVENT_NAME.TABLE}:${findTable._id}`, findTable);
+                    findTable = yield (0, redisOption_1.redisGet)(`${redisConstant_1.REDIS_EVENT_NAME.TABLE}:${findTable._id}`);
+                    findTable = JSON.parse(findTable);
                     if (isBot == false) {
                         data = {
-                            eventName: SOCKET_EVENT_NAME.JOIN_TABLE,
+                            eventName: socketEventName_1.SOCKET_EVENT_NAME.JOIN_TABLE,
                             data: {
                                 data: findTable,
                                 message: "ok"
                             },
                             socket
-                        }
-                        sendToSocketIdEmmiter(data)
+                        };
+                        (0, eventEmmitter_1.sendToSocketIdEmmiter)(data);
                         return;
                     }
                 }
-            } else {
-                let generateTableId: any = await generateId()
+            }
+            else {
+                let generateTableId = yield (0, generateId_1.generateId)();
                 data = {
                     _id: generateTableId,
                     playerInfo: [{
-                        userId: _id,
-                        userName,
-                        isBot,
-                        isActive: true
-                    }],
+                            userId: _id,
+                            userName,
+                            isBot,
+                            isActive: true
+                        }],
                     tableData: [
                         {
                             pieceId: 'B1',
@@ -263,60 +273,60 @@ const joinTable = async (data: any, socket: any) => {
                     activePlayer: 1,
                     currentTurnSeatIndex: null,
                     winnerSeatIndex: null,
-                    gameStatus: GAME_STATUS.WAITING
-                }
-                await redisSet(`${REDIS_EVENT_NAME.TABLE}:${generateTableId}`, data)
-                let findTable: any = await redisGet(`${REDIS_EVENT_NAME.TABLE}:${generateTableId}`)
-                findTable = JSON.parse(findTable)
+                    gameStatus: gameStatus_1.GAME_STATUS.WAITING
+                };
+                yield (0, redisOption_1.redisSet)(`${redisConstant_1.REDIS_EVENT_NAME.TABLE}:${generateTableId}`, data);
+                let findTable = yield (0, redisOption_1.redisGet)(`${redisConstant_1.REDIS_EVENT_NAME.TABLE}:${generateTableId}`);
+                findTable = JSON.parse(findTable);
                 if (!findTable) {
                     data = {
-                        eventName: SOCKET_EVENT_NAME.POP_UP,
+                        eventName: socketEventName_1.SOCKET_EVENT_NAME.POP_UP,
                         data: {
                             message: `Can't found Table By generateTableId.`
                         },
                         socket
-                    }
-                    sendToSocketIdEmmiter(data)
-                    logger.info(`END joinTable :::: ${JSON.stringify(data.data)}`)
+                    };
+                    (0, eventEmmitter_1.sendToSocketIdEmmiter)(data);
+                    logger_1.logger.info(`END joinTable :::: ${JSON.stringify(data.data)}`);
                     return;
                 }
-
-                let queue: any = await redisGet(REDIS_EVENT_NAME.QUEUE)
-                queue = JSON.parse(queue)
+                let queue = yield (0, redisOption_1.redisGet)(redisConstant_1.REDIS_EVENT_NAME.QUEUE);
+                queue = JSON.parse(queue);
                 if (playWithBot == false) {
                     if (queue) {
-                        await redisDel(`${REDIS_EVENT_NAME.QUEUE}`)
-                        queue.push(findTable._id)
-                        await redisSet(`${REDIS_EVENT_NAME.QUEUE}`, queue)
-                    } else {
-                        data = [findTable._id]
-                        await redisSet(`${REDIS_EVENT_NAME.QUEUE}`, data)
+                        yield (0, redisOption_1.redisDel)(`${redisConstant_1.REDIS_EVENT_NAME.QUEUE}`);
+                        queue.push(findTable._id);
+                        yield (0, redisOption_1.redisSet)(`${redisConstant_1.REDIS_EVENT_NAME.QUEUE}`, queue);
+                    }
+                    else {
+                        data = [findTable._id];
+                        yield (0, redisOption_1.redisSet)(`${redisConstant_1.REDIS_EVENT_NAME.QUEUE}`, data);
                     }
                 }
-                socket.join(findTable._id)
+                socket.join(findTable._id);
                 data = {
-                    eventName: SOCKET_EVENT_NAME.JOIN_TABLE,
+                    eventName: socketEventName_1.SOCKET_EVENT_NAME.JOIN_TABLE,
                     data: {
                         data: findTable,
                         message: "ok"
                     },
                     socket
-                }
-                sendToSocketIdEmmiter(data)
+                };
+                (0, eventEmmitter_1.sendToSocketIdEmmiter)(data);
                 if (playWithBot == true) {
                     data = {
                         tableId: findTable._id,
-                        timer: BULL_TIMER.JOIN_BOT_TIMER
-                    }
-                    joinBotQueue(data, socket)
+                        timer: bullTimer_1.BULL_TIMER.JOIN_BOT_TIMER
+                    };
+                    (0, joinBotQueue_1.joinBotQueue)(data, socket);
                 }
-                logger.info(`END joinTable :::: ${JSON.stringify(data)}`)
+                logger_1.logger.info(`END joinTable :::: ${JSON.stringify(data.data)}`);
                 return;
             }
         }
-    } catch (error) {
-        logger.error(`CATCH_ERROR joinTable :::: ${error}`)
     }
-}
-
-export { joinTable }
+    catch (error) {
+        logger_1.logger.error(`CATCH_ERROR joinTable :::: ${error}`);
+    }
+});
+exports.joinTable = joinTable;

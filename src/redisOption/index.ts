@@ -1,7 +1,7 @@
 import { redis } from "../connection/redisConnection";
 import { logger } from "../logger";
 
-const redisSet = async (key: string, data: string) => {
+const redisSet = async (key: string, data: any) => {
     try {
         logger.info(`START redisSet ::: ${key} DATA :::: ${JSON.stringify(data)}`);
         let dataOfRedisSet: any = await redis.set(key, JSON.stringify(data));

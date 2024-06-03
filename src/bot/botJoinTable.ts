@@ -1,19 +1,17 @@
-import { SOCKET_EVENT_NAME } from "../constant/socketEventName"
 import { logger } from "../logger"
 import { joinTable } from "../playing/joinTable"
 
 const botJoinTable = async (data: any, socket: any) => {
     try {
-        logger.info(`START botJoinTable :::: `)
+        logger.info(`START botJoinTable :::: ${JSON.stringify(data)}`)
         data = {
-            eventName: SOCKET_EVENT_NAME.JOIN_TABLE,
-            data: {
-                _id: data._id,
-                userName: data.userName,
-                isBot: data.isBot
-            }
+            _id: data._id,
+            userName: data.userName,
+            isBot: data.isBot,
+            tableId: data.tableId
         }
-        await joinTable(data, socket)
+        joinTable(data, socket)
+        logger.info(`END botJoinTable ::: ${JSON.stringify(data)}`)
     } catch (error) {
         logger.error(`CATCH_ERROR botJoinTable :::: ${error}`)
     }

@@ -11,16 +11,21 @@ const signUp = async (data: any, socket: any) => {
         logger.info(`START signUp :::: DATA :::: ${JSON.stringify(data)}`)
         let checkData: any = await signUpValidation(data)
         if (checkData?.error) {
-            data = {
-                eventName: SOCKET_EVENT_NAME.POP_UP,
-                data: {
-                    message: checkData.error.details[0].message
-                },
-                socket
+            if (data.isBot == true) {
+                data = {
+                    eventName: SOCKET_EVENT_NAME.POP_UP,
+                    data: {
+                        message: checkData.error.details[0].message
+                    },
+                    socket
+                }
+                sendToSocketIdEmmiter(data)
+                logger.info(`END signUp :::: ${JSON.stringify(data.data)}`)
+                return;
+            } else {
+                logger.info(`END signUp :::: ${checkData.error.details[0].message}`)
+                return checkData.error.details[0].message
             }
-            sendToSocketIdEmmiter(data)
-            logger.info(`END signUp :::: ${JSON.stringify(data.data)}`)
-            return;
         }
         const { userName, isBot } = data
         let _id: string = generateId()
@@ -31,8 +36,6 @@ const signUp = async (data: any, socket: any) => {
             isBot,
             tableId: ""
         }
-        logger.info(`signUp Data ${data}`)
-        console.log("Sign Up", data)
         await redisSet(`${REDIS_EVENT_NAME.USER}:${_id}`, data)
         let User: any = await redisGet(`${REDIS_EVENT_NAME.USER}:${_id}`);
         User = JSON.parse(User)

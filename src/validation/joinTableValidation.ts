@@ -9,6 +9,7 @@ const joinTableValidation = async (data: any) => {
             userName: Joi.string().required(),
             isBot: Joi.boolean().required(),
             playWithBot: Joi.boolean(),
+            tableId: Joi.string(),
         });
 
         let resultofjoinTable = joinTableSchema.validate(data);

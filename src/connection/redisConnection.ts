@@ -17,8 +17,8 @@ const connectRedis = async () => {
         redis.connect()
         redis.on("connect", () => {
             logger.info("Redis Connected...");
-            
-                redis.flushDb();
+
+            redis.flushDb();
         })
         redis.on('error', (error: any) => {
             logger.error(`CATCH_ERROR connectRedis :: ${error}`);
