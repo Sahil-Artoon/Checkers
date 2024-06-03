@@ -309,8 +309,10 @@ const joinTable = async (data: any, socket: any) => {
                         timer: BULL_TIMER.JOIN_BOT_TIMER
                     }
                     joinBotQueue(data, socket)
+                    logger.info(`END joinTable :::: ${JSON.stringify(data)}`)
+                    return;
                 }
-                logger.info(`END joinTable :::: ${JSON.stringify(data)}`)
+                logger.info(`END joinTable :::: ${JSON.stringify(data.data)}`)
                 return;
             }
         }

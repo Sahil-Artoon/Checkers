@@ -89,6 +89,7 @@ const joinTable = (data) => {
         setUserSession("USER_TABLE", data.tableData, 60)
         document.getElementById('section-2').style.display = "none"
         document.getElementById('section-3').style.display = "block"
+        document.getElementById('section-4').style.display = "block"
     }
 }
 

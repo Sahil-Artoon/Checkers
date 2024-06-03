@@ -6,7 +6,7 @@ const sendToSocketIdEmmiter = (data: any) => {
         logger.info(`RESPONSE EVENT NAME :: ${data.eventName} DATA :: ${JSON.stringify(data.data)}`)
         io.to(data.socket.id).emit(data.eventName, data.data)
     } catch (error) {
-        logger.error(`CATCH_ERROR sendToSocketIdEmmiter :: ${data} , ${error}`);
+        logger.error(`CATCH_ERROR sendToSocketIdEmmiter :: ${error}`);
     }
 }
 
@@ -15,7 +15,7 @@ const sendToRoomEmmiter = (data: any) => {
         logger.info(`RESPONSE EVENT NAME :: ${data.eventName} DATA :: ${JSON.stringify(data.data)}`)
         io.to(data.data._id).emit(data.eventName, data.data)
     } catch (error) {
-        logger.error(`CATCH_ERROR sendToSocketIdEmmiter :: ${data} , ${error}`);
+        logger.error(`CATCH_ERROR sendToSocketIdEmmiter :: ${error}`);
     }
 }
 

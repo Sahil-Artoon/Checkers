@@ -198,3 +198,18 @@ input[type="submit"]:hover {
 .black-piece {
     background-color: black;
 }
+
+/* :::::::::::: SECTION 4  :::::::::::: */
+#section-4 {
+    position: absolute;
+    left: 46%;
+    top: 46%;
+    font-size: 50px;
+    display: none;
+}
+
+#section-4>div {
+    color: #fff;
+    background-color: #0000005b;
+    padding: 25px 20px;
+}
