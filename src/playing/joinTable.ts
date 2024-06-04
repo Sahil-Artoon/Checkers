@@ -1,11 +1,12 @@
-import { signUpBot } from "../bot/signUpBot"
 import { joinBotQueue } from "../bull/Queue/joinBotQueue"
+import { lockTableQueue } from "../bull/Queue/lockTableQueue"
+import { roundTimerQueue } from "../bull/Queue/roundTimerQueue"
 import { generateId } from "../common/generateId"
 import { BULL_TIMER } from "../constant/bullTimer"
 import { GAME_STATUS } from "../constant/gameStatus"
 import { REDIS_EVENT_NAME } from "../constant/redisConstant"
 import { SOCKET_EVENT_NAME } from "../constant/socketEventName"
-import { sendToSocketIdEmmiter } from "../eventEmmitter"
+import { sendToRoomEmmiter, sendToSocketIdEmmiter } from "../eventEmmitter"
 import { logger } from "../logger"
 import { redisDel, redisGet, redisSet } from "../redisOption"
 import { joinTableValidation } from "../validation/joinTableValidation"
@@ -27,7 +28,7 @@ const joinTable = async (data: any, socket: any) => {
             return;
         }
 
-        let { _id, userName, isBot, playWithBot, tableId } = data
+        let { _id, userName, isBot, playWithBot } = data
 
         let findUser: any = await redisGet(`${REDIS_EVENT_NAME.USER}:${_id}`)
         findUser = JSON.parse(findUser)
@@ -36,7 +37,7 @@ const joinTable = async (data: any, socket: any) => {
             data = {
                 eventName: SOCKET_EVENT_NAME.POP_UP,
                 data: {
-                    message: `Can't found User By _id.`
+                    message: `Can't found User By _id. ${_id}`
                 },
                 socket
             }
@@ -44,11 +45,11 @@ const joinTable = async (data: any, socket: any) => {
             logger.info(`END joinTable :::: ${JSON.stringify(data.data)}`)
             return;
         }
-        if (tableId) {
+        if (data?.tableId) {
             console.log(":::::::::::::::::::::::::::::::")
             console.log("Inside Table Id ")
             console.log(":::::::::::::::::::::::::::::::")
-            let findTable: any = await redisGet(`${REDIS_EVENT_NAME.TABLE}:${tableId}`)
+            let findTable: any = await redisGet(`${REDIS_EVENT_NAME.TABLE}:${data?.tableId}`)
             findTable = JSON.parse(findTable)
             if (findTable) {
                 findTable.playerInfo.push({
@@ -62,8 +63,25 @@ const joinTable = async (data: any, socket: any) => {
                 await redisSet(`${REDIS_EVENT_NAME.TABLE}:${findTable._id}`, findTable)
                 findTable = await redisGet(`${REDIS_EVENT_NAME.TABLE}:${findTable._id}`)
                 findTable = JSON.parse(findTable)
-                logger.info(`END joinTable PlayWithBot :::: ${JSON.stringify(findTable)}`)
-                return;
+                data = {
+                    eventName: SOCKET_EVENT_NAME.ROUND_TIMER,
+                    data: {
+                        _id: findTable._id,
+                        message: "ok",
+                        timer: BULL_TIMER.ROUND_TIMER
+                    }
+                }
+                sendToRoomEmmiter(data)
+                data = {
+                    tableId: findTable._id,
+                    timer: BULL_TIMER.ROUND_TIMER,
+                }
+                roundTimerQueue(data, socket)
+                data = {
+                    tableId: findTable._id,
+                    timer: BULL_TIMER.LOCK_TABLE
+                }
+                lockTableQueue(data, socket)
             }
         } else {
             let findtableByQueue: any = await redisGet(REDIS_EVENT_NAME.QUEUE)
@@ -97,17 +115,37 @@ const joinTable = async (data: any, socket: any) => {
                     findTable = await redisGet(`${REDIS_EVENT_NAME.TABLE}:${findTable._id}`)
                     findTable = JSON.parse(findTable)
                     if (isBot == false) {
+                        socket.join(findTable._id)
                         data = {
                             eventName: SOCKET_EVENT_NAME.JOIN_TABLE,
                             data: {
-                                data: findTable,
+                                tableId: findTable._id,
+                                playerData: findTable.playerInfo,
                                 message: "ok"
                             },
                             socket
                         }
                         sendToSocketIdEmmiter(data)
-                        return;
                     }
+                    data = {
+                        eventName: SOCKET_EVENT_NAME.ROUND_TIMER,
+                        data: {
+                            _id: findTable._id,
+                            message: "ok",
+                            timer: BULL_TIMER.ROUND_TIMER
+                        }
+                    }
+                    sendToRoomEmmiter(data)
+                    data = {
+                        tableId: findTable._id,
+                        timer: BULL_TIMER.ROUND_TIMER,
+                    }
+                    roundTimerQueue(data, socket)
+                    data = {
+                        tableId: findTable._id,
+                        timer: BULL_TIMER.LOCK_TABLE
+                    }
+                    lockTableQueue(data, socket)
                 }
             } else {
                 let generateTableId: any = await generateId()
@@ -181,20 +219,44 @@ const joinTable = async (data: any, socket: any) => {
                         },
                         { place: 24 },
                         { place: 25 },
-                        { place: 26 },
+                        {
+                            place: 26,
+                            pieceId: ''
+                        },
                         { place: 27 },
-                        { place: 28 },
+                        {
+                            place: 28,
+                            pieceId: ''
+                        },
                         { place: 29 },
-                        { place: 30 },
+                        {
+                            place: 30,
+                            pieceId: ''
+                        },
                         { place: 31 },
-                        { place: 32 },
-                        { place: 33 },
+                        {
+                            place: 32,
+                            pieceId: ''
+                        },
+                        {
+                            place: 33,
+                            pieceId: ''
+                        },
                         { place: 34 },
-                        { place: 35 },
+                        {
+                            place: 35,
+                            pieceId: ''
+                        },
                         { place: 36 },
-                        { place: 37 },
+                        {
+                            place: 37,
+                            pieceId: ''
+                        },
                         { place: 38 },
-                        { place: 39 },
+                        {
+                            place: 39,
+                            pieceId: ''
+                        },
                         { place: 40 },
                         { place: 41 },
                         {
@@ -297,7 +359,8 @@ const joinTable = async (data: any, socket: any) => {
                 data = {
                     eventName: SOCKET_EVENT_NAME.JOIN_TABLE,
                     data: {
-                        data: findTable,
+                        tableId: findTable._id,
+                        playerData: findTable.playerInfo,
                         message: "ok"
                     },
                     socket

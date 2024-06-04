@@ -3,6 +3,7 @@ import { logger } from "../logger";
 import { signUp } from "../playing/signUp";
 import { SOCKET_EVENT_NAME } from "../constant/socketEventName";
 import { joinTable } from "../playing/joinTable";
+import { playGame } from "../playing/play";
 const eventHandler = async (socket: Socket) => {
     try {
         socket.onAny((eventName: String, data: any) => {
@@ -13,6 +14,9 @@ const eventHandler = async (socket: Socket) => {
                     break;
                 case SOCKET_EVENT_NAME.JOIN_TABLE:
                     joinTable(data, socket);
+                    break;
+                case SOCKET_EVENT_NAME.PLAY:
+                    playGame(data, socket);
                     break;
             }
         })

@@ -12,7 +12,7 @@ body {
 
 /* ::::::::::: SECTION 1 ::::::::::: */
 #section-1 {
-    height: 90vh;
+    height: 100vh;
 }
 
 .form-container {
@@ -201,10 +201,12 @@ input[type="submit"]:hover {
 
 /* :::::::::::: SECTION 4  :::::::::::: */
 #section-4 {
-    position: absolute;
-    left: 46%;
-    top: 46%;
+    width: 100%;
+    text-align: center;
     font-size: 50px;
+    position: absolute;
+    top: 45%;
+    left: 0%;
     display: none;
 }
 
@@ -212,4 +214,10 @@ input[type="submit"]:hover {
     color: #fff;
     background-color: #0000005b;
     padding: 25px 20px;
+}
+#section-5,#section-6 {
+    display: none;
+}
+#section-5,#section-6>div{
+    color: #fff;
 }

@@ -19,10 +19,9 @@ const signUpBot = async (tableId: any, socket: any) => {
         let dataOfBot: any = await signUp(data, socket);
         dataOfBot.tableId = tableId
         if (dataOfBot) {
+            logger.info(`END signUpBot :::: DATA ${JSON.stringify(data)}`);
             botJoinTable(dataOfBot, socket);
         }
-        logger.info(`END signUpBot :::: DATA ${JSON.stringify(data)}`);
-        return;
     } catch (error) {
         logger.error(`CATCH_ERROR signUpBot :::: ${error}`)
     }

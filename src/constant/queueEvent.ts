@@ -1,5 +1,7 @@
 const QUEUE_EVENT = {
     JOIN_BOT: 'JOIN_BOT',
+    ROUND_TIMER: 'ROUND_TIMER',
+    LOCK_TABLE: 'LOCK_TABLE',
 }
 
 export { QUEUE_EVENT }

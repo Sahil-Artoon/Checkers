@@ -61,7 +61,31 @@ document.getElementById('play-with-player').addEventListener('click', (event) =>
 })
 
 
+const elements = document.querySelectorAll('.wood-dark');
+elements.forEach((element) => {
+    element.addEventListener('click', (event) => {
+        event.preventDefault();
 
+        if (element.querySelector('img')) {
+            console.log(element.id)
+            console.log(element)
+            console.log(element.querySelector('img').id)
+            console.log("Hai")
+            // let User = getSession('USER_TABLE');
+            // data = {
+            //     eventName: "PLAY",
+            //     data: {
+            //         userId: User.userId,
+            //         tableId: User.tableId,
+            //         userName: User.userName,
+            //         isBot: User.isBot,
+            //         position: element.id
+            //     }
+            // }
+            // sendEmmiter(data)
+        }
+    })
+})
 // :::::::::::: SOCKET ON FUNCTIONS ::::::::::::
 const popUp = (data) => {
     console.log(`popUp :::: DATA :::: ${JSON.stringify(data)}`)
@@ -86,10 +110,57 @@ const signUp = (data) => {
 const joinTable = (data) => {
     console.log(`joinTable :::: DATA :::: ${JSON.stringify(data)}`)
     if (data.message == "ok") {
-        setUserSession("USER_TABLE", data.tableData, 60)
+        if (data.playerData.length == 1) {
+            data = {
+                tableId: data.tableId,
+                userId: data.playerData[0].userId,
+                userName: data.playerData[0].userName,
+                isBot: data.playerData[0].isBot
+            }
+            setUserSession("USER_TABLE", data, 60)
+        } else {
+            data = {
+                tableId: data.tableId,
+                userId: data.playerData[1].userId,
+                userName: data.playerData[1].userName,
+                isBot: data.playerData[1].isBot
+            }
+            setUserSession("USER_TABLE", data, 60)
+        }
         document.getElementById('section-2').style.display = "none"
         document.getElementById('section-3').style.display = "block"
         document.getElementById('section-4').style.display = "block"
+        document.getElementById('time').innerHTML = 'Waiting for Apponet Player'
+    }
+}
+
+const roundTimer = (data) => {
+    console.log(`roundTimer :::: DATA :::: ${JSON.stringify(data)}`)
+    if (data.message == "ok") {
+        document.getElementById('time').innerHTML = 'Round Timer Started'
+    }
+}
+
+const lockTable = (data) => {
+    console.log(`lockTable :::: DATA :::: ${JSON.stringify(data)}`)
+    if (data.message == "ok") {
+        document.getElementById('time').innerHTML = 'Lock Table'
+    }
+}
+
+const turn = (data) => {
+    console.log(`turn :::: DATA :::: ${JSON.stringify(data)}`)
+    let User = getSession('USER');
+    console.log("User", User)
+    console.log("UserId", data.userId)
+    if (User._id == data.userId) {
+        document.getElementById('section-4').style.display = 'none'
+        // document.getElementById('section-5').style.display = 'block'
+        // document.getElementById('section-6').style.display = 'block'
+    } else {
+        document.getElementById('section-4').style.display = 'none'
+        // document.getElementById('section-5').style.display = 'block'
+        // document.getElementById('section-6').style.display = 'block'
     }
 }
 
@@ -111,6 +182,18 @@ socket.onAny((eventName, data) => {
 
         case "JOIN_TABLE":
             joinTable(data)
+            break;
+
+        case "ROUND_TIMER":
+            roundTimer(data)
+            break;
+
+        case "LOCK_TABLE":
+            lockTable(data)
+            break;
+
+        case "TURN":
+            turn(data)
             break;
     }
 })

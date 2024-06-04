@@ -1,4 +1,6 @@
 const BULL_TIMER = {
-    JOIN_BOT_TIMER: 13000,
+    JOIN_BOT_TIMER: 2000,
+    ROUND_TIMER:5000,
+    LOCK_TABLE:3000,
 }
 export { BULL_TIMER }

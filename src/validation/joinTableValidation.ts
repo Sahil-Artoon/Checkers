@@ -13,7 +13,7 @@ const joinTableValidation = async (data: any) => {
         });
 
         let resultofjoinTable = joinTableSchema.validate(data);
-        logger.info(`END : signUpValidation :: DATA :: ${JSON.stringify(data)}`);
+        logger.info(`END : joinTableValidation :: DATA :: ${JSON.stringify(data)}`);
         return resultofjoinTable;
     } catch (error) {
         logger.error(`CATCH_ERROR joinTableValidation :::: ${error}`)
