@@ -6,6 +6,9 @@ const SOCKET_EVENT_NAME = {
     LOCK_TABLE: 'LOCK_TABLE',
     TURN: 'TURN',
     PLAY: "PLAY",
+    SEND_PLACE: "SEND_PLACE",
+    MOVE: "MOVE",
+    CHANGE_TURN: "CHANGE_TURN",
 }
 
 export { SOCKET_EVENT_NAME }

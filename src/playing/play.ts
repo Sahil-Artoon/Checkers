@@ -1,6 +1,6 @@
 import { REDIS_EVENT_NAME } from "../constant/redisConstant"
 import { SOCKET_EVENT_NAME } from "../constant/socketEventName"
-import { sendToSocketIdEmmiter } from "../eventEmmitter"
+import { sendToRoomEmmiter, sendToSocketIdEmmiter } from "../eventEmmitter"
 import { logger } from "../logger"
 import { redisGet } from "../redisOption"
 import { playGameValidation } from "../validation/playGameValidation"
@@ -57,12 +57,31 @@ const playGame = async (data: any, socket: any) => {
             return;
         }
         if (findTable.currentTurnUserId == userId) {
+            let color = findTable.playerInfo[findTable.currentTurnSeatIndex].color
             let parts = position.split("-");
             let numberOfBox = parts[1];
             console.log("This is NumberOfBox :::", numberOfBox)
-            let place = findTable.playingData
-            let sendPosition = await checkPosition(numberOfBox, place)
+            let place = findTable.tableData
+            let sendPosition: any = await checkPosition(numberOfBox, place, color)
             console.log("This is SendPosition :::", sendPosition)
+            if (sendPosition) {
+                data = {
+                    eventName: SOCKET_EVENT_NAME.SEND_PLACE,
+                    data: {
+                        _id: tableId,
+                        tableId,
+                        userId,
+                        userName,
+                        isBot,
+                        position,
+                        sendPosition,
+                        message: "ok"
+                    }
+                }
+                sendToRoomEmmiter(data)
+            } else {
+                console.log("Empty !!!")
+            }
         }
     } catch (error) {
         logger.error(`CATCH_ERROR playGame :::: ${error}`)

@@ -56,7 +56,8 @@ const joinTable = async (data: any, socket: any) => {
                     userId: _id,
                     userName,
                     isBot,
-                    isActive: true
+                    isActive: true,
+                    color: 'black'
                 })
                 findTable.activePlayer = findTable.activePlayer + 1;
                 await redisDel(`${REDIS_EVENT_NAME.TABLE}: ${findTable._id}`)
@@ -107,7 +108,8 @@ const joinTable = async (data: any, socket: any) => {
                         userId: _id,
                         userName,
                         isBot,
-                        isActive: true
+                        isActive: true,
+                        color:'black'
                     })
                     findTable.activePlayer = findTable.activePlayer + 1;
                     await redisDel(`${REDIS_EVENT_NAME.TABLE}: ${findTable._id}`)
@@ -155,7 +157,8 @@ const joinTable = async (data: any, socket: any) => {
                         userId: _id,
                         userName,
                         isBot,
-                        isActive: true
+                        isActive: true,
+                        color: 'red'
                     }],
                     tableData: [
                         {
@@ -221,41 +224,41 @@ const joinTable = async (data: any, socket: any) => {
                         { place: 25 },
                         {
                             place: 26,
-                            pieceId: ''
+                            pieceId: null
                         },
                         { place: 27 },
                         {
                             place: 28,
-                            pieceId: ''
+                            pieceId: null
                         },
                         { place: 29 },
                         {
                             place: 30,
-                            pieceId: ''
+                            pieceId: null
                         },
                         { place: 31 },
                         {
                             place: 32,
-                            pieceId: ''
+                            pieceId: null
                         },
                         {
                             place: 33,
-                            pieceId: ''
+                            pieceId: null
                         },
                         { place: 34 },
                         {
                             place: 35,
-                            pieceId: ''
+                            pieceId: null
                         },
                         { place: 36 },
                         {
                             place: 37,
-                            pieceId: ''
+                            pieceId: null
                         },
                         { place: 38 },
                         {
                             place: 39,
-                            pieceId: ''
+                            pieceId: null
                         },
                         { place: 40 },
                         { place: 41 },

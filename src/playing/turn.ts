@@ -14,6 +14,7 @@ const turn = async (tableId: any, socket: any) => {
         } else {
             ramdomNumberForGiveUserTurn = 0;
         }
+        console.log("TURN of THIS PLAYER ", ramdomNumberForGiveUserTurn)
         let findTable: any = await redisGet(`${REDIS_EVENT_NAME.TABLE}:${tableId}`)
         findTable = JSON.parse(findTable)
         if (findTable) {
@@ -26,7 +27,7 @@ const turn = async (tableId: any, socket: any) => {
                 eventName: SOCKET_EVENT_NAME.TURN,
                 data: {
                     _id: findTable?._id,
-                    symbol: findTable?.playerInfo[ramdomNumberForGiveUserTurn].symbol,
+                    color: findTable?.playerInfo[ramdomNumberForGiveUserTurn].color,
                     userId: findTable?.playerInfo[ramdomNumberForGiveUserTurn].userId,
                     message: "ok"
                 }
