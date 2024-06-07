@@ -9,7 +9,7 @@ const checkPosition = (p: any, place: any, color: any) => {
                 3: [],
                 5: [],
                 7: [],
-                10: [1,3],
+                10: [1, 3],
                 12: [3, 5],
                 14: [5, 7],
                 16: [7],

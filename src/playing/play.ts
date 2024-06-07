@@ -59,7 +59,7 @@ const playGame = async (data: any, socket: any) => {
         if (findTable.currentTurnUserId == userId) {
             let color = findTable.playerInfo[findTable.currentTurnSeatIndex].color
             let parts = position.split("-");
-            let numberOfBox = parts[1];
+            let numberOfBox = (parts[1]) - 1;
             console.log("This is NumberOfBox :::", numberOfBox)
             let place = findTable.tableData
             let sendPosition: any = await checkPosition(numberOfBox, place, color)
