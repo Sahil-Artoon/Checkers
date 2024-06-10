@@ -3,6 +3,7 @@ let userId;
 let color;
 let positonOfClickPiece;
 let tableId;
+let dataOfPlay
 function setUserSession(key, value, expire) {
     const now = new Date().getTime();
     const expirationTime = now + expire * 60 * 1000;
@@ -111,7 +112,8 @@ function handleClick(event) {
                         tableId,
                         userId,
                         movePosition: element.id,
-                        movePiece: positonOfClickPiece
+                        movePiece: positonOfClickPiece,
+                        dataOfPlay
                     }
                 }
                 sendEmmiter(data)
@@ -250,9 +252,10 @@ const printPlace = (data) => {
             console.log("data", data)
             document.getElementById(`${data.position}`).style.opacity = 0.7;
             positonOfClickPiece = data.position
+            dataOfPlay = data.sendPosition
             for (let i = 0; i < data.sendPosition.length; i++) {
-                document.getElementById(`D-${data.sendPosition[i]}`).classList.add("selected");
-                document.getElementById(`D-${data.sendPosition[i]}`).style.backgroundColor = '#0080009e'
+                document.getElementById(`D-${data.sendPosition[i].push}`).classList.add("selected");
+                document.getElementById(`D-${data.sendPosition[i].push}`).style.backgroundColor = '#0080009e'
             }
         }
     }
@@ -261,6 +264,10 @@ const printPlace = (data) => {
 const move = (data) => {
     console.log(`move :::: DATA :::: ${JSON.stringify(data)}`)
     if (data.message == "ok") {
+        if (data.removePiece) {
+            let img = document.getElementById(`D-${data.removePiece}`).querySelector(`img`)
+            document.getElementById(`D-${data.removePiece}`).removeChild(img)
+        }
         let img = document.getElementById(`${data.emptyBoxId}`).querySelector(`img`)
         document.getElementById(`${data.emptyBoxId}`).removeChild(img)
         document.getElementById(`${data.addBoxId}`).appendChild(img)

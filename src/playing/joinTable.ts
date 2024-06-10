@@ -109,7 +109,7 @@ const joinTable = async (data: any, socket: any) => {
                         userName,
                         isBot,
                         isActive: true,
-                        color:'black'
+                        color: 'black'
                     })
                     findTable.activePlayer = findTable.activePlayer + 1;
                     await redisDel(`${REDIS_EVENT_NAME.TABLE}: ${findTable._id}`)
@@ -162,62 +162,62 @@ const joinTable = async (data: any, socket: any) => {
                     }],
                     tableData: [
                         {
-                            pieceId: 'B1',
+                            pieceId: 'B-1',
                             place: 1
                         },
                         { place: 2 },
                         {
-                            pieceId: 'B2',
+                            pieceId: 'B-2',
                             place: 3
                         },
                         { place: 4 },
                         {
-                            pieceId: 'B3',
+                            pieceId: 'B-3',
                             place: 5
                         },
                         { place: 6 },
                         {
-                            pieceId: 'B4',
+                            pieceId: 'B-4',
                             place: 7
                         },
                         { place: 8 },
                         { place: 9 },
                         {
-                            pieceId: 'B5',
+                            pieceId: 'B-5',
                             place: 10
                         },
                         { place: 11 },
                         {
-                            pieceId: 'B6',
+                            pieceId: 'B-6',
                             place: 12
                         },
                         { place: 13 },
                         {
-                            pieceId: 'B7',
+                            pieceId: 'B-7',
                             place: 14
                         },
                         { place: 15 },
                         {
-                            pieceId: 'B8',
+                            pieceId: 'B-8',
                             place: 16
                         },
                         {
-                            pieceId: 'B9',
+                            pieceId: 'B-9',
                             place: 17
                         },
                         { place: 18 },
                         {
-                            pieceId: 'B10',
+                            pieceId: 'B-10',
                             place: 19
                         },
                         { place: 20 },
                         {
-                            pieceId: 'B11',
+                            pieceId: 'B-11',
                             place: 21
                         },
                         { place: 22 },
                         {
-                            pieceId: 'B12',
+                            pieceId: 'B-12',
                             place: 23
                         },
                         { place: 24 },
@@ -263,64 +263,62 @@ const joinTable = async (data: any, socket: any) => {
                         { place: 40 },
                         { place: 41 },
                         {
-                            pieceId: 'R1',
+                            pieceId: 'R-1',
                             place: 42
                         },
                         { place: 43 },
                         {
-                            pieceId: "R2",
+                            pieceId: "R-2",
                             place: 44
                         },
                         { place: 45 },
                         {
-                            pieceId: "R3",
+                            pieceId: "R-3",
                             place: 46
                         },
                         { place: 47 },
                         {
-                            pieceId: "R4",
+                            pieceId: "R-4",
                             place: 48
                         },
                         {
-                            pieceId: "R5",
+                            pieceId: "R-5",
                             place: 49
                         },
+                        { place: 50 },
                         {
-                            place: 50
-                        },
-                        {
-                            pieceId: "R6",
+                            pieceId: "R-6",
                             place: 51
                         },
                         { place: 52 },
                         {
-                            pieceId: "R7",
+                            pieceId: "R-7",
                             place: 53
                         },
                         { place: 54 },
                         {
-                            pieceId: "R8",
+                            pieceId: "R-8",
                             place: 55
                         },
                         { place: 56 },
                         { place: 57 },
                         {
-                            pieceId: "R9",
+                            pieceId: "R-9",
                             place: 58
                         },
                         { place: 59 },
                         {
-                            pieceId: "R10",
+                            pieceId: "R-10",
                             place: 60
                         },
                         { place: 61 },
                         {
-                            pieceId: "R11",
+                            pieceId: "R-11",
                             place: 62
                         },
                         { place: 63 },
                         {
-                            pieceId: "R12",
+                            pieceId: "R-12",
                             place: 64
                         }
                     ],
@@ -328,6 +326,8 @@ const joinTable = async (data: any, socket: any) => {
                     activePlayer: 1,
                     currentTurnSeatIndex: null,
                     winnerSeatIndex: null,
+                    redTotalLose: 0,
+                    blackTotalLose: 0,
                     gameStatus: GAME_STATUS.WAITING
                 }
                 await redisSet(`${REDIS_EVENT_NAME.TABLE}:${generateTableId}`, data)

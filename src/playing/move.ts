@@ -22,11 +22,14 @@ const move = async (data: any, socket: any) => {
             logger.error(`END move :::: ${JSON.stringify(data.data.message)}`)
             return;
         }
-        let { movePiece, tableId, movePosition, userId } = data
+        let { movePiece, tableId, movePosition, userId, dataOfPlay } = data
+        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         console.log(`movePiece :::: ${movePiece}`)
         console.log(`tableId :::: ${tableId}`)
         console.log(`movePosition :::: ${movePosition}`)
         console.log(`userId :::: ${userId}`)
+        console.log("dataOfPlay :::: ", dataOfPlay)
+        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
         let parts = movePiece.split("-");
         let numberOfBoxWhoShift = parts[1];
@@ -52,6 +55,20 @@ const move = async (data: any, socket: any) => {
         }
 
         if (findTable) {
+            let removePiece: any = null
+            for (let i = 0; i < dataOfPlay.length; i++) {
+                if (dataOfPlay[i].check != 0 && numberOfShiftBox == dataOfPlay[i].push) {
+                    findTable.tableData[dataOfPlay[i].check - 1].pieceId = null
+                    removePiece = dataOfPlay[i].check
+                    let checkColor: string = findTable.playerInfo[findTable.currentTurnSeatIndex].color
+                    if (checkColor == 'red') {
+                        findTable.blackTotalLose = findTable.blackTotalLose + 1
+                    }
+                    else if (checkColor == 'black') {
+                        findTable.redTotalLose = findTable.redTotalLose + 1
+                    }
+                }
+            }
             console.log("findTable", findTable.tableData)
             let pieceId = findTable.tableData[numberOfBoxWhoShift - 1].pieceId
             console.log("pieceId", pieceId)
@@ -77,6 +94,7 @@ const move = async (data: any, socket: any) => {
                     emptyBoxId: movePiece,
                     addBoxId: movePosition,
                     message: "ok",
+                    removePiece
                 }
             }
             sendToRoomEmmiter(data)

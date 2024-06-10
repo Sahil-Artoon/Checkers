@@ -8,7 +8,8 @@ const moveValidation = async (data: any) => {
             userId: Joi.string().required(),
             movePosition: Joi.string().required(),
             tableId: Joi.string().required(),
-            movePiece: Joi.string().required()
+            movePiece: Joi.string().required(),
+            dataOfPlay: Joi.any().required(),
         });
 
         let resultOfMove = moveSchema.validate(data);
