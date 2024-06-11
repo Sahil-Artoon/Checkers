@@ -264,13 +264,72 @@ const printPlace = (data) => {
 const move = (data) => {
     console.log(`move :::: DATA :::: ${JSON.stringify(data)}`)
     if (data.message == "ok") {
+        console.log("DATA OF removePiece PIECE :::: ", data.removePiece)
+        console.log("DATA OF emptyBoxId PIECE :::: ", data.emptyBoxId)
+        console.log("DATA OF REMOVE addBoxId :::: ", data.addBoxId)
         if (data.removePiece) {
             let img = document.getElementById(`D-${data.removePiece}`).querySelector(`img`)
             document.getElementById(`D-${data.removePiece}`).removeChild(img)
         }
-        let img = document.getElementById(`${data.emptyBoxId}`).querySelector(`img`)
-        document.getElementById(`${data.emptyBoxId}`).removeChild(img)
-        document.getElementById(`${data.addBoxId}`).appendChild(img)
+        let part = data.emptyBoxId.split("-")
+        let checkColor = part[0]
+        let numberOfBoxes = part[1]
+        let addBoxId = data.addBoxId.split("-")[0]
+        if (checkColor == "blackKing") {
+            let img = document.getElementById(`blackKing-${numberOfBoxes}`).querySelector(`img`)
+            document.getElementById(`blackKing-${numberOfBoxes}`).removeChild(img)
+            document.getElementById(`blackKing-${numberOfBoxes}`).removeAttribute('id')
+            document.getElementById(`blackKing-${numberOfBoxes}`).id = `D-${numberOfBoxes}`
+            let ele = document.getElementById(`${data.addBoxId}`)
+            document.getElementById(`${data.addBoxId}`).removeAttribute('id')
+            ele.id = `blackKing-${addBoxId}`
+            document.getElementById(`blackKing-${addBoxId}`).appendChild(img)
+        } else if (checkColor == 'redKing') {
+            let img = document.getElementById(`redKing-${numberOfBoxes}`).querySelector(`img`)
+            document.getElementById(`redKing-${numberOfBoxes}`).removeChild(img)
+            document.getElementById(`redKing-${numberOfBoxes}`).removeAttribute('id')
+            document.getElementById(`redKing-${numberOfBoxes}`).id = `D-${numberOfBoxes}`
+            let ele = document.getElementById(`${data.addBoxId}`)
+            document.getElementById(`${data.addBoxId}`).removeAttribute('id')
+            ele.id = `redKing-${addBoxId}`
+            document.getElementById(`redKing-${addBoxId}`).appendChild(img)
+        } else {
+            let img = document.getElementById(`${data.emptyBoxId}`).querySelector(`img`)
+            document.getElementById(`${data.emptyBoxId}`).removeChild(img)
+            document.getElementById(`${data.addBoxId}`).appendChild(img)
+        }
+    }
+}
+
+
+// const move = (data) => {
+//     console.log(`move :::: DATA :::: ${JSON.stringify(data)}`)
+//     if (data.message == "ok") {
+//         if (data.removePiece) {
+//             let img = document.getElementById(`D-${data.removePiece}`).querySelector(`img`)
+//             document.getElementById(`D-${data.removePiece}`).removeChild(img)
+//         }
+//         let img = document.getElementById(`${data.emptyBoxId}`).querySelector(`img`)
+//         document.getElementById(`${data.emptyBoxId}`).removeChild(img)
+//         document.getElementById(`${data.addBoxId}`).appendChild(img)
+//     }
+// }
+
+const king = (data) => {
+    console.log(`king :::: DATA :::: ${JSON.stringify(data)}`)
+    if (data.message == "ok") {
+        let getEle = document.getElementById(`D-${data.numberOfBox}`)
+        console.log('This is getEle::::::', getEle)
+        if (data.colorOfKing == "black") {
+            getEle.querySelector('img').src = 'image/black_king.png'
+            getEle.removeAttribute('id')
+            getEle.id = `blackKing-${data.numberOfBox}`
+        }
+        if (data.colorOfKing == "red") {
+            getEle.querySelector('img').src = 'image/red_king.png'
+            getEle.removeAttribute('id')
+            getEle.id = `redKing-${data.numberOfBox}`
+        }
     }
 }
 
@@ -316,6 +375,9 @@ socket.onAny((eventName, data) => {
 
         case "MOVE":
             move(data)
+            break;
+        case "KING":
+            king(data)
             break;
     }
 })

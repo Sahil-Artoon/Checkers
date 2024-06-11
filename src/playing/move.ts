@@ -5,6 +5,7 @@ import { logger } from "../logger"
 import { redisDel, redisGet, redisSet } from "../redisOption"
 import { moveValidation } from "../validation/moveValidation"
 import { changeTurn } from "./changeTurn"
+import { checkKing } from "./checkKing"
 
 const move = async (data: any, socket: any) => {
     try {
@@ -98,6 +99,21 @@ const move = async (data: any, socket: any) => {
                 }
             }
             sendToRoomEmmiter(data)
+            let checkKingOrNot: any = await checkKing(findTable)
+            if (checkKingOrNot) {
+                logger.info(`checkKingOrNot ::::: ${JSON.stringify(checkKingOrNot)}`)
+                data = {
+                    eventName: SOCKET_EVENT_NAME.KING,
+                    data: {
+                        _id: findTable._id,
+                        numberOfBox: checkKingOrNot.numberOfBox,
+                        pieceId: checkKingOrNot.pieceId,
+                        colorOfKing: checkKingOrNot.colorOfKing,
+                        message: "ok"
+                    }
+                }
+                sendToRoomEmmiter(data)
+            }
             changeTurn(findTable._id, socket)
         }
     } catch (error) {

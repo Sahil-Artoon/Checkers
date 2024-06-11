@@ -9,6 +9,7 @@ const SOCKET_EVENT_NAME = {
     SEND_PLACE: "SEND_PLACE",
     MOVE: "MOVE",
     CHANGE_TURN: "CHANGE_TURN",
+    KING: "KING",
 }
 
 export { SOCKET_EVENT_NAME }
