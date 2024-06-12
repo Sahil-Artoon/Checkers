@@ -17,17 +17,19 @@ const checkKing = (data: any) => {
         for (let pos of positions) {
             let piece = data.tableData[pos.index];
             if (piece && piece.pieceId) {
-                let [color] = piece.pieceId.split('-');
-                console.log("::::::::::::::::::::::: COLOR IN CHECKKING :::::::::::::::::::::::")
-                console.log(color)
-                if (color === pos.expectedColor) {
-                    data = {
-                        numberOfBox: pos.numberOfBox,
-                        pieceId: piece.pieceId,
-                        colorOfKing: pos.colorOfKing
-                    };
-                    logger.info(`END checkKing :::: DATA :::: ${JSON.stringify(data)}`)
-                    return data
+                if (piece.pieceId !== 'R-king' && piece.pieceId !== 'B-king') {
+                    let [color] = piece.pieceId.split('-');
+                    console.log("::::::::::::::::::::::: COLOR IN CHECKKING :::::::::::::::::::::::")
+                    console.log(color)
+                    if (color === pos.expectedColor) {
+                        data = {
+                            numberOfBox: pos.numberOfBox,
+                            pieceId: piece.pieceId,
+                            colorOfKing: pos.colorOfKing
+                        };
+                        logger.info(`END checkKing :::: DATA :::: ${JSON.stringify(data)}`)
+                        return data
+                    }
                 }
             }
         }

@@ -6,6 +6,7 @@ import { redisDel, redisGet, redisSet } from "../redisOption"
 import { moveValidation } from "../validation/moveValidation"
 import { changeTurn } from "./changeTurn"
 import { checkKing } from "./checkKing"
+import { checkWinner } from "./checkWinner"
 
 const move = async (data: any, socket: any) => {
     try {
@@ -33,10 +34,10 @@ const move = async (data: any, socket: any) => {
         console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
         let parts = movePiece.split("-");
-        let numberOfBoxWhoShift = parts[1];
+        let movePieceBox = parts[1];
 
         let part = movePosition.split("-");
-        let numberOfShiftBox = part[1];
+        let moviePositionBox = part[1];
 
 
         let findTable: any = await redisGet(`${REDIS_EVENT_NAME.TABLE}:${tableId}`)
@@ -58,7 +59,7 @@ const move = async (data: any, socket: any) => {
         if (findTable) {
             let removePiece: any = null
             for (let i = 0; i < dataOfPlay.length; i++) {
-                if (dataOfPlay[i].check != 0 && numberOfShiftBox == dataOfPlay[i].push) {
+                if (dataOfPlay[i].check != 0 && moviePositionBox == dataOfPlay[i].push) {
                     findTable.tableData[dataOfPlay[i].check - 1].pieceId = null
                     removePiece = dataOfPlay[i].check
                     let checkColor: string = findTable.playerInfo[findTable.currentTurnSeatIndex].color
@@ -67,54 +68,83 @@ const move = async (data: any, socket: any) => {
                     }
                     else if (checkColor == 'black') {
                         findTable.redTotalLose = findTable.redTotalLose + 1
+                    } else if (checkColor == 'redKing') {
+                        findTable.redTotalLose = findTable.redTotalLose + 1
+                    } else if (checkColor == 'blackKing') {
+                        findTable.blackTotalLose = findTable.blackTotalLose + 1
                     }
                 }
             }
-            console.log("findTable", findTable.tableData)
-            let pieceId = findTable.tableData[numberOfBoxWhoShift - 1].pieceId
-            console.log("pieceId", pieceId)
-            console.log("findTable.tableData[numberOfBoxWhoShift - 1] :::: ", findTable.tableData[numberOfBoxWhoShift - 1])
-            console.log("findTable.tableData[numberOfShiftBox - 1] :::: ", findTable.tableData[numberOfShiftBox - 1])
-            findTable.tableData[numberOfBoxWhoShift - 1].pieceId = null
-            findTable.tableData[numberOfShiftBox - 1].pieceId = pieceId
-            console.log("findTable.tableData[numberOfBoxWhoShift - 1] :::: ", findTable.tableData[numberOfBoxWhoShift - 1])
-            console.log("findTable.tableData[numberOfShiftBox - 1] :::: ", findTable.tableData[numberOfShiftBox - 1])
-            console.log(":::::::::::::::::::::::::::::::::::::::::")
-            console.log("findTable of TableData", findTable.tableData)
-            console.log(":::::::::::::::::::::::::::::::::::::::::")
+            console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+            console.log("dataOfplay.length === :::: ", dataOfPlay.length)
+            for (let i = 0; i < dataOfPlay.length; i++) {
+                console.log(`This is ${dataOfPlay[i]} And Push Is :::: ${dataOfPlay[i].push} `)
+                if (dataOfPlay[i].push == moviePositionBox) {
+                    console.log("This is Inside of dataOfPlay[i].push :::: ", dataOfPlay[i].push, "and moviePositonBox is :::: ", moviePositionBox)
+                    let pieceId = findTable.tableData[movePieceBox - 1].pieceId
+                    findTable.tableData[movePieceBox - 1].pieceId = null
+                    findTable.tableData[moviePositionBox - 1].pieceId = pieceId
+                    await redisDel(`${REDIS_EVENT_NAME.TABLE}:${tableId}`)
+                    await redisSet(`${REDIS_EVENT_NAME.TABLE}:${tableId}`, findTable)
+                    findTable = await redisGet(`${REDIS_EVENT_NAME.TABLE}:${tableId}`)
+                    findTable = JSON.parse(findTable)
+                    data = {
+                        eventName: SOCKET_EVENT_NAME.MOVE,
+                        data: {
+                            _id: findTable?._id,
+                            emptyBoxId: movePiece,
+                            addBoxId: movePosition,
+                            message: "ok",
+                            removePiece
+                        }
+                    }
+                    sendToRoomEmmiter(data)
+                    let checkKingOrNot: any = await checkKing(findTable)
+                    if (checkKingOrNot) {
+                        logger.info(`checkKingOrNot ::::: ${JSON.stringify(checkKingOrNot)}`)
+                        if (checkKingOrNot.colorOfKing == "red") {
+                            findTable.tableData[checkKingOrNot.numberOfBox - 1].pieceId = 'R-king'
+                        }
+                        if (checkKingOrNot.colorOfKing == 'black') {
+                            findTable.tableData[checkKingOrNot.numberOfBox - 1].pieceId = 'B-king'
+                        }
+                        await redisDel(`${REDIS_EVENT_NAME.TABLE}:${findTable._id}`)
+                        await redisSet(`${REDIS_EVENT_NAME.TABLE}:${findTable._id}`, findTable)
+                        data = {
+                            eventName: SOCKET_EVENT_NAME.KING,
+                            data: {
+                                _id: findTable._id,
+                                numberOfBox: checkKingOrNot.numberOfBox,
+                                pieceId: checkKingOrNot.pieceId,
+                                colorOfKing: checkKingOrNot.colorOfKing,
+                                message: "ok"
+                            }
+                        }
+                        sendToRoomEmmiter(data)
+                    }
+                    let checkWinnerOrNot = await checkWinner(findTable._id)
+                    console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+                    console.log(`This is checkWinnerOrNot :::: `, checkWinnerOrNot)
+                    console.log('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
+                    if (checkWinnerOrNot == 0) {
+                        return changeTurn(findTable._id, socket)
+                    } else {
+                        data = {
+                            eventName: SOCKET_EVENT_NAME.WINNER,
+                            data: {
+                                _id: findTable._id,
+                                message: "ok",
+                                userId: checkWinnerOrNot
+                            }
+                        }
+                        sendToRoomEmmiter(data)
+                        return;
+                    }
+                }
+            }
+            console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
 
-            await redisDel(`${REDIS_EVENT_NAME.TABLE}:${tableId}`)
-            await redisSet(`${REDIS_EVENT_NAME.TABLE}:${tableId}`, findTable)
-            findTable = await redisGet(`${REDIS_EVENT_NAME.TABLE}:${tableId}`)
-            findTable = JSON.parse(findTable)
-            console.log(findTable)
-            data = {
-                eventName: SOCKET_EVENT_NAME.MOVE,
-                data: {
-                    _id: findTable?._id,
-                    emptyBoxId: movePiece,
-                    addBoxId: movePosition,
-                    message: "ok",
-                    removePiece
-                }
-            }
-            sendToRoomEmmiter(data)
-            let checkKingOrNot: any = await checkKing(findTable)
-            if (checkKingOrNot) {
-                logger.info(`checkKingOrNot ::::: ${JSON.stringify(checkKingOrNot)}`)
-                data = {
-                    eventName: SOCKET_EVENT_NAME.KING,
-                    data: {
-                        _id: findTable._id,
-                        numberOfBox: checkKingOrNot.numberOfBox,
-                        pieceId: checkKingOrNot.pieceId,
-                        colorOfKing: checkKingOrNot.colorOfKing,
-                        message: "ok"
-                    }
-                }
-                sendToRoomEmmiter(data)
-            }
-            changeTurn(findTable._id, socket)
+
         }
     } catch (error) {
         logger.error(`CATCH_ERROR move :::: ${error}`)

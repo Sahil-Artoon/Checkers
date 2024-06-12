@@ -1,5 +1,6 @@
 const socket = io();
 let userId;
+let userName;
 let color;
 let positonOfClickPiece;
 let tableId;
@@ -156,6 +157,7 @@ const signUp = (data) => {
     console.log(`signUp :::: DATA :::: ${JSON.stringify(data)}`)
     if (data.message == "ok") {
         userId = data.User._id
+        userName = data.User.userName
         data = {
             _id: data.User._id,
             userName: data.User.userName,
@@ -268,31 +270,47 @@ const move = (data) => {
         console.log("DATA OF emptyBoxId PIECE :::: ", data.emptyBoxId)
         console.log("DATA OF REMOVE addBoxId :::: ", data.addBoxId)
         if (data.removePiece) {
-            let img = document.getElementById(`D-${data.removePiece}`).querySelector(`img`)
-            document.getElementById(`D-${data.removePiece}`).removeChild(img)
+            let findEle = document.getElementById(`D-${data.removePiece}`)
+            if (findEle == null) {
+                findEle = document.getElementById(`redKing-${data.removePiece}`)
+                if (findEle == null) {
+                    findEle = document.getElementById(`blackKing-${data.removePiece}`)
+                }
+            }
+            let img = findEle.querySelector(`img`)
+            findEle.removeChild(img)
+            findEle.removeAttribute('id')
+            findEle.id = `D-${data.removePiece}`
         }
         let part = data.emptyBoxId.split("-")
         let checkColor = part[0]
         let numberOfBoxes = part[1]
-        let addBoxId = data.addBoxId.split("-")[0]
+        let addBoxId = data.addBoxId.split("-")[1]
+        console.log(":::: This is Check Color in MOVE :::: ", checkColor)
         if (checkColor == "blackKing") {
-            let img = document.getElementById(`blackKing-${numberOfBoxes}`).querySelector(`img`)
-            document.getElementById(`blackKing-${numberOfBoxes}`).removeChild(img)
-            document.getElementById(`blackKing-${numberOfBoxes}`).removeAttribute('id')
-            document.getElementById(`blackKing-${numberOfBoxes}`).id = `D-${numberOfBoxes}`
-            let ele = document.getElementById(`${data.addBoxId}`)
-            document.getElementById(`${data.addBoxId}`).removeAttribute('id')
-            ele.id = `blackKing-${addBoxId}`
-            document.getElementById(`blackKing-${addBoxId}`).appendChild(img)
+            let ele = document.getElementById(data.emptyBoxId)
+            let img = ele.querySelector("img")
+            ele.removeChild(img)
+            ele.removeAttribute("id")
+            ele.id = `D-${numberOfBoxes}`
+            let addEle = document.getElementById(data.addBoxId)
+            console.log("This is move addEle checkColor = blackKing", addEle)
+            console.log("This is move IMG checkColor = blackKing", img)
+            addEle.removeAttribute("id")
+            addEle.id = `blackKing-${addBoxId}`
+            addEle.appendChild(img)
         } else if (checkColor == 'redKing') {
-            let img = document.getElementById(`redKing-${numberOfBoxes}`).querySelector(`img`)
-            document.getElementById(`redKing-${numberOfBoxes}`).removeChild(img)
-            document.getElementById(`redKing-${numberOfBoxes}`).removeAttribute('id')
-            document.getElementById(`redKing-${numberOfBoxes}`).id = `D-${numberOfBoxes}`
-            let ele = document.getElementById(`${data.addBoxId}`)
-            document.getElementById(`${data.addBoxId}`).removeAttribute('id')
-            ele.id = `redKing-${addBoxId}`
-            document.getElementById(`redKing-${addBoxId}`).appendChild(img)
+            let ele = document.getElementById(data.emptyBoxId)
+            let img = ele.querySelector("img")
+            ele.removeChild(img)
+            ele.removeAttribute("id")
+            ele.id = `D-${numberOfBoxes}`
+            let addEle = document.getElementById(data.addBoxId)
+            console.log("This is move addEle checkColor = blackKing", addEle)
+            console.log("This is move IMG checkColor = blackKing", img)
+            addEle.removeAttribute("id")
+            addEle.id = `redKing-${addBoxId}`
+            addEle.appendChild(img)
         } else {
             let img = document.getElementById(`${data.emptyBoxId}`).querySelector(`img`)
             document.getElementById(`${data.emptyBoxId}`).removeChild(img)
@@ -329,6 +347,18 @@ const king = (data) => {
             getEle.querySelector('img').src = 'image/red_king.png'
             getEle.removeAttribute('id')
             getEle.id = `redKing-${data.numberOfBox}`
+        }
+    }
+}
+
+const winner = (data) => {
+    console.log(`winner :::: DATA ${JSON.stringify(data)}`)
+    if (data.message == "ok") {
+        document.getElementById('section-4').style.display = "block"
+        if (data.userId == userId) {
+            document.getElementById('time').innerHTML = `You Win ${userName}`
+        } else {
+            document.getElementById('time').innerHTML = `You Lose ${userName}`
         }
     }
 }
@@ -378,6 +408,9 @@ socket.onAny((eventName, data) => {
             break;
         case "KING":
             king(data)
+            break;
+        case "WINNER":
+            winner(data)
             break;
     }
 })

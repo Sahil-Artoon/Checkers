@@ -326,7 +326,7 @@ const joinTable = async (data: any, socket: any) => {
                     activePlayer: 1,
                     currentTurnSeatIndex: null,
                     winnerSeatIndex: null,
-                    redTotalLose: 0,
+                    redTotalLose: 11,
                     blackTotalLose: 0,
                     gameStatus: GAME_STATUS.WAITING
                 }

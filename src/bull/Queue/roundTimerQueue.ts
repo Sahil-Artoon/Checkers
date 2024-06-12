@@ -12,7 +12,7 @@ const roundTimerQueue = async (data: any, socket: any) => {
         let joinBot = new Queue(QUEUE_EVENT.ROUND_TIMER, redisOption);
         let options = {
             jobId: data.tableId,
-            delay: data.timer,
+            delay: data.timer, 
             removeOnComplete: true
         }
         joinBot.add(data, options)
