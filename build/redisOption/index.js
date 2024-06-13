@@ -14,9 +14,9 @@ const redisConnection_1 = require("../connection/redisConnection");
 const logger_1 = require("../logger");
 const redisSet = (key, data) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        logger_1.logger.info(`START redisSet ::: ${key} DATA :::: ${JSON.stringify(data)}`);
+        logger_1.logger.info(`START redisSet ::: ${key}`);
         let dataOfRedisSet = yield redisConnection_1.redis.set(key, JSON.stringify(data));
-        logger_1.logger.info(`END redisSet ::: ${key} DATA :::: ${JSON.stringify(dataOfRedisSet)}`);
+        logger_1.logger.info(`END redisSet ::: ${key} `);
         return;
     }
     catch (error) {
@@ -28,7 +28,8 @@ const redisGet = (key) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         logger_1.logger.info(`START redisGet ::: ${key}`);
         let dataOfRedisGet = yield redisConnection_1.redis.get(key);
-        logger_1.logger.info(`END redisGet ::: ${key} DATA :::: ${dataOfRedisGet}`);
+        console.log("DATA Of redis Get", dataOfRedisGet);
+        logger_1.logger.info(`END redisGet ::: ${key}`);
         return dataOfRedisGet;
     }
     catch (error) {
@@ -40,7 +41,7 @@ const redisDel = (key) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         logger_1.logger.info(`START redisDel ::: ${key}`);
         let dataOfRedisDel = yield redisConnection_1.redis.del(key);
-        logger_1.logger.info(`END redisDel ::: ${key} DATA :::: ${JSON.stringify(dataOfRedisDel)}`);
+        logger_1.logger.info(`END redisDel ::: ${key}`);
         return;
     }
     catch (error) {

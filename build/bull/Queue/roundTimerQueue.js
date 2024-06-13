@@ -12,16 +12,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.joinBotQueue = void 0;
+exports.roundTimerQueue = void 0;
 const bull_1 = __importDefault(require("bull"));
 const redisConnection_1 = require("../../connection/redisConnection");
 const queueEvent_1 = require("../../constant/queueEvent");
 const logger_1 = require("../../logger");
-const signUpBot_1 = require("../../bot/signUpBot");
-const joinBotQueue = (data, socket) => __awaiter(void 0, void 0, void 0, function* () {
+const turn_1 = require("../../playing/turn");
+const roundTimerQueue = (data, socket) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        logger_1.logger.info(`START joinBotQueue :::: DATA :::: ${JSON.stringify(data)}`);
-        let joinBot = new bull_1.default(queueEvent_1.QUEUE_EVENT.JOIN_BOT, redisConnection_1.redisOption);
+        logger_1.logger.info(`START roundTimerQueue :::: DATA :::: ${JSON.stringify(data)}`);
+        let joinBot = new bull_1.default(queueEvent_1.QUEUE_EVENT.ROUND_TIMER, redisConnection_1.redisOption);
         let options = {
             jobId: data.tableId,
             delay: data.timer,
@@ -29,12 +29,12 @@ const joinBotQueue = (data, socket) => __awaiter(void 0, void 0, void 0, functio
         };
         joinBot.add(data, options);
         joinBot.process((data) => __awaiter(void 0, void 0, void 0, function* () {
-            (0, signUpBot_1.signUpBot)(data.data.tableId, socket);
+            (0, turn_1.turn)(data.data.tableId, socket);
         }));
-        logger_1.logger.info(`END joinBotQueue ::::`);
+        logger_1.logger.info(`END roundTimerQueue :::`);
     }
     catch (error) {
-        logger_1.logger.error(`CATCH_ERROR joinBotQueue :::: ${error}`);
+        logger_1.logger.error(`CATCH_ERROR roundTimerQueue :::: ${error}`);
     }
 });
-exports.joinBotQueue = joinBotQueue;
+exports.roundTimerQueue = roundTimerQueue;

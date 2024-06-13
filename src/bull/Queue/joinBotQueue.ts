@@ -16,9 +16,8 @@ const joinBotQueue = async (data: any, socket: any) => {
         joinBot.add(data, options)
         joinBot.process(async (data: any) => {
             signUpBot(data.data.tableId, socket)
-            logger.info(`END joinBotQueue ::::`)
         })
-
+        logger.info(`END joinBotQueue ::::`)
     } catch (error) {
         logger.error(`CATCH_ERROR joinBotQueue :::: ${error}`)
     }

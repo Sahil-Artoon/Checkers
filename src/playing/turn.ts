@@ -1,3 +1,4 @@
+import { GAME_STATUS } from "../constant/gameStatus"
 import { REDIS_EVENT_NAME } from "../constant/redisConstant"
 import { SOCKET_EVENT_NAME } from "../constant/socketEventName"
 import { sendToRoomEmmiter } from "../eventEmmitter"
@@ -20,7 +21,7 @@ const turn = async (tableId: any, socket: any) => {
         if (findTable) {
             findTable.currentTurnSeatIndex = ramdomNumberForGiveUserTurn
             findTable.currentTurnUserId = findTable?.playerInfo[ramdomNumberForGiveUserTurn].userId
-            findTable.gameStatus = "CHECK_TURN"
+            findTable.gameStatus = GAME_STATUS.PLAYING
             await redisDel(`${REDIS_EVENT_NAME.TABLE}:${findTable._id}`)
             await redisSet(`${REDIS_EVENT_NAME.TABLE}:${findTable._id}`, findTable)
             let data = {
@@ -34,7 +35,6 @@ const turn = async (tableId: any, socket: any) => {
             }
             sendToRoomEmmiter(data)
         }
-
     } catch (error) {
         logger.error(`CATCH_ERROR turn :::: ${error}`)
     }

@@ -30,10 +30,9 @@ const signUpBot = (tableId, socket) => __awaiter(void 0, void 0, void 0, functio
         let dataOfBot = yield (0, signUp_1.signUp)(data, socket);
         dataOfBot.tableId = tableId;
         if (dataOfBot) {
+            logger_1.logger.info(`END signUpBot :::: DATA ${JSON.stringify(data)}`);
             (0, botJoinTable_1.botJoinTable)(dataOfBot, socket);
         }
-        logger_1.logger.info(`END signUpBot :::: DATA ${JSON.stringify(data)}`);
-        return;
     }
     catch (error) {
         logger_1.logger.error(`CATCH_ERROR signUpBot :::: ${error}`);

@@ -16,6 +16,7 @@ const redisGet = async (key: string) => {
     try {
         logger.info(`START redisGet ::: ${key}`);
         let dataOfRedisGet: any = await redis.get(key);
+        console.log("DATA Of redis Get", dataOfRedisGet);
         logger.info(`END redisGet ::: ${key}`);
         return dataOfRedisGet
     } catch (error) {

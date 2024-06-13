@@ -6,10 +6,7 @@ import { redisDel, redisGet, redisSet } from "../redisOption"
 
 const changeTurn = async (tableId: any, socket: any) => {
     try {
-        console.log('"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""')
         logger.info(`START changeTurn :::: DATA :::: ${tableId}`)
-        console.log('"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""')
-
         if (tableId) {
             let findTable: any = await redisGet(`${REDIS_EVENT_NAME.TABLE}:${tableId}`)
             findTable = JSON.parse(findTable)

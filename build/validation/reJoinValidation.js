@@ -12,25 +12,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.joinTableValidation = void 0;
+exports.reJoinValidation = void 0;
 const joi_1 = __importDefault(require("joi"));
 const logger_1 = require("../logger");
-const joinTableValidation = (data) => __awaiter(void 0, void 0, void 0, function* () {
+const reJoinValidation = (data) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        logger_1.logger.info(`START joinTableValidation :::: DATA :::: ${JSON.stringify(data)}`);
-        const joinTableSchema = joi_1.default.object({
-            _id: joi_1.default.string().required(),
-            userName: joi_1.default.string().required(),
-            isBot: joi_1.default.boolean().required(),
-            playWithBot: joi_1.default.boolean(),
-            tableId: joi_1.default.string(),
+        logger_1.logger.info(`START reJoinValidation :::: DATA :::: ${JSON.stringify(data)}`);
+        const reJoinSchema = joi_1.default.object({
+            tableId: joi_1.default.string().required(),
+            userId: joi_1.default.string().required(),
         });
-        let resultofjoinTable = joinTableSchema.validate(data);
-        logger_1.logger.info(`END : joinTableValidation :: DATA :: ${JSON.stringify(data)}`);
-        return resultofjoinTable;
+        let resultOfReJoin = reJoinSchema.validate(data);
+        logger_1.logger.info(`END : reJoinValidation :: DATA :: ${JSON.stringify(data)}`);
+        return resultOfReJoin;
     }
     catch (error) {
-        logger_1.logger.error(`CATCH_ERROR joinTableValidation :::: ${error}`);
+        logger_1.logger.error(`CATCH_ERROR reJoinValidation :::: ${error}`);
     }
 });
-exports.joinTableValidation = joinTableValidation;
+exports.reJoinValidation = reJoinValidation;

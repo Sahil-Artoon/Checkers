@@ -11,6 +11,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.joinTable = void 0;
 const joinBotQueue_1 = require("../bull/Queue/joinBotQueue");
+const lockTableQueue_1 = require("../bull/Queue/lockTableQueue");
+const roundTimerQueue_1 = require("../bull/Queue/roundTimerQueue");
 const generateId_1 = require("../common/generateId");
 const bullTimer_1 = require("../constant/bullTimer");
 const gameStatus_1 = require("../constant/gameStatus");
@@ -36,14 +38,14 @@ const joinTable = (data, socket) => __awaiter(void 0, void 0, void 0, function* 
             logger_1.logger.info(`END joinTable :::: ${JSON.stringify(data.data)}`);
             return;
         }
-        let { _id, userName, isBot, playWithBot, tableId } = data;
+        let { _id, userName, isBot, playWithBot } = data;
         let findUser = yield (0, redisOption_1.redisGet)(`${redisConstant_1.REDIS_EVENT_NAME.USER}:${_id}`);
         findUser = JSON.parse(findUser);
         if (!findUser) {
             data = {
                 eventName: socketEventName_1.SOCKET_EVENT_NAME.POP_UP,
                 data: {
-                    message: `Can't found User By _id.`
+                    message: `Can't found User By _id. ${_id}`
                 },
                 socket
             };
@@ -51,26 +53,65 @@ const joinTable = (data, socket) => __awaiter(void 0, void 0, void 0, function* 
             logger_1.logger.info(`END joinTable :::: ${JSON.stringify(data.data)}`);
             return;
         }
-        if (tableId) {
+        if (findUser) {
+            if (findUser.tableId != "") {
+                data = {
+                    eventName: socketEventName_1.SOCKET_EVENT_NAME.POP_UP,
+                    data: {
+                        message: `User already Play.`
+                    },
+                    socket
+                };
+                (0, eventEmmitter_1.sendToSocketIdEmmiter)(data);
+                logger_1.logger.info(`END joinTable :::: ${JSON.stringify(data.data)}`);
+                return;
+            }
+        }
+        if (data === null || data === void 0 ? void 0 : data.tableId) {
             console.log(":::::::::::::::::::::::::::::::");
             console.log("Inside Table Id ");
             console.log(":::::::::::::::::::::::::::::::");
-            let findTable = yield (0, redisOption_1.redisGet)(`${redisConstant_1.REDIS_EVENT_NAME.TABLE}:${tableId}`);
+            let findTable = yield (0, redisOption_1.redisGet)(`${redisConstant_1.REDIS_EVENT_NAME.TABLE}:${data === null || data === void 0 ? void 0 : data.tableId}`);
             findTable = JSON.parse(findTable);
             if (findTable) {
                 findTable.playerInfo.push({
                     userId: _id,
                     userName,
                     isBot,
-                    isActive: true
+                    isActive: true,
+                    color: 'black'
                 });
                 findTable.activePlayer = findTable.activePlayer + 1;
                 yield (0, redisOption_1.redisDel)(`${redisConstant_1.REDIS_EVENT_NAME.TABLE}: ${findTable._id}`);
                 yield (0, redisOption_1.redisSet)(`${redisConstant_1.REDIS_EVENT_NAME.TABLE}:${findTable._id}`, findTable);
                 findTable = yield (0, redisOption_1.redisGet)(`${redisConstant_1.REDIS_EVENT_NAME.TABLE}:${findTable._id}`);
                 findTable = JSON.parse(findTable);
-                logger_1.logger.info(`END joinTable PlayWithBot :::: ${JSON.stringify(findTable)}`);
-                return;
+                let findUser = yield (0, redisOption_1.redisGet)(`${redisConstant_1.REDIS_EVENT_NAME.USER}:${_id}`);
+                findUser = JSON.parse(findUser);
+                if (findUser) {
+                    findUser.tableId = findTable._id;
+                }
+                yield (0, redisOption_1.redisDel)(`${redisConstant_1.REDIS_EVENT_NAME.USER}:${_id}`);
+                yield (0, redisOption_1.redisSet)(`${redisConstant_1.REDIS_EVENT_NAME.USER}:${_id}`, findUser);
+                data = {
+                    eventName: socketEventName_1.SOCKET_EVENT_NAME.ROUND_TIMER,
+                    data: {
+                        _id: findTable._id,
+                        message: "ok",
+                        timer: bullTimer_1.BULL_TIMER.ROUND_TIMER
+                    }
+                };
+                (0, eventEmmitter_1.sendToRoomEmmiter)(data);
+                data = {
+                    tableId: findTable._id,
+                    timer: bullTimer_1.BULL_TIMER.ROUND_TIMER,
+                };
+                (0, roundTimerQueue_1.roundTimerQueue)(data, socket);
+                data = {
+                    tableId: findTable._id,
+                    timer: bullTimer_1.BULL_TIMER.LOCK_TABLE
+                };
+                (0, lockTableQueue_1.lockTableQueue)(data, socket);
             }
         }
         else {
@@ -98,25 +139,54 @@ const joinTable = (data, socket) => __awaiter(void 0, void 0, void 0, function* 
                         userId: _id,
                         userName,
                         isBot,
-                        isActive: true
+                        isActive: true,
+                        color: 'black'
                     });
                     findTable.activePlayer = findTable.activePlayer + 1;
                     yield (0, redisOption_1.redisDel)(`${redisConstant_1.REDIS_EVENT_NAME.TABLE}: ${findTable._id}`);
                     yield (0, redisOption_1.redisSet)(`${redisConstant_1.REDIS_EVENT_NAME.TABLE}:${findTable._id}`, findTable);
                     findTable = yield (0, redisOption_1.redisGet)(`${redisConstant_1.REDIS_EVENT_NAME.TABLE}:${findTable._id}`);
                     findTable = JSON.parse(findTable);
+                    let findUser = yield (0, redisOption_1.redisGet)(`${redisConstant_1.REDIS_EVENT_NAME.USER}:${_id}`);
+                    findUser = JSON.parse(findUser);
+                    if (findUser) {
+                        findUser.tableId = findTable._id;
+                    }
+                    yield (0, redisOption_1.redisDel)(`${redisConstant_1.REDIS_EVENT_NAME.USER}:${_id}`);
+                    yield (0, redisOption_1.redisSet)(`${redisConstant_1.REDIS_EVENT_NAME.USER}:${_id}`, findUser);
                     if (isBot == false) {
+                        socket.join(findTable._id);
                         data = {
                             eventName: socketEventName_1.SOCKET_EVENT_NAME.JOIN_TABLE,
                             data: {
-                                data: findTable,
+                                tableId: findTable._id,
+                                playerData: findTable.playerInfo,
+                                tableData: findTable.tableData,
                                 message: "ok"
                             },
                             socket
                         };
                         (0, eventEmmitter_1.sendToSocketIdEmmiter)(data);
-                        return;
                     }
+                    data = {
+                        eventName: socketEventName_1.SOCKET_EVENT_NAME.ROUND_TIMER,
+                        data: {
+                            _id: findTable._id,
+                            message: "ok",
+                            timer: bullTimer_1.BULL_TIMER.ROUND_TIMER
+                        }
+                    };
+                    (0, eventEmmitter_1.sendToRoomEmmiter)(data);
+                    data = {
+                        tableId: findTable._id,
+                        timer: bullTimer_1.BULL_TIMER.ROUND_TIMER,
+                    };
+                    (0, roundTimerQueue_1.roundTimerQueue)(data, socket);
+                    data = {
+                        tableId: findTable._id,
+                        timer: bullTimer_1.BULL_TIMER.LOCK_TABLE
+                    };
+                    (0, lockTableQueue_1.lockTableQueue)(data, socket);
                 }
             }
             else {
@@ -127,145 +197,168 @@ const joinTable = (data, socket) => __awaiter(void 0, void 0, void 0, function* 
                             userId: _id,
                             userName,
                             isBot,
-                            isActive: true
+                            isActive: true,
+                            color: 'red'
                         }],
                     tableData: [
                         {
-                            pieceId: 'B1',
+                            pieceId: 'B-1',
                             place: 1
                         },
                         { place: 2 },
                         {
-                            pieceId: 'B2',
+                            pieceId: 'B-2',
                             place: 3
                         },
                         { place: 4 },
                         {
-                            pieceId: 'B3',
+                            pieceId: 'B-3',
                             place: 5
                         },
                         { place: 6 },
                         {
-                            pieceId: 'B4',
+                            pieceId: 'B-4',
                             place: 7
                         },
                         { place: 8 },
                         { place: 9 },
                         {
-                            pieceId: 'B5',
+                            pieceId: 'B-5',
                             place: 10
                         },
                         { place: 11 },
                         {
-                            pieceId: 'B6',
+                            pieceId: 'B-6',
                             place: 12
                         },
                         { place: 13 },
                         {
-                            pieceId: 'B7',
+                            pieceId: 'B-7',
                             place: 14
                         },
                         { place: 15 },
                         {
-                            pieceId: 'B8',
+                            pieceId: 'B-8',
                             place: 16
                         },
                         {
-                            pieceId: 'B9',
+                            pieceId: 'B-9',
                             place: 17
                         },
                         { place: 18 },
                         {
-                            pieceId: 'B10',
+                            pieceId: 'B-10',
                             place: 19
                         },
                         { place: 20 },
                         {
-                            pieceId: 'B11',
+                            pieceId: 'B-11',
                             place: 21
                         },
                         { place: 22 },
                         {
-                            pieceId: 'B12',
+                            pieceId: 'B-12',
                             place: 23
                         },
                         { place: 24 },
                         { place: 25 },
-                        { place: 26 },
+                        {
+                            place: 26,
+                            pieceId: null
+                        },
                         { place: 27 },
-                        { place: 28 },
+                        {
+                            place: 28,
+                            pieceId: null
+                        },
                         { place: 29 },
-                        { place: 30 },
+                        {
+                            place: 30,
+                            pieceId: null
+                        },
                         { place: 31 },
-                        { place: 32 },
-                        { place: 33 },
+                        {
+                            place: 32,
+                            pieceId: null
+                        },
+                        {
+                            place: 33,
+                            pieceId: null
+                        },
                         { place: 34 },
-                        { place: 35 },
+                        {
+                            place: 35,
+                            pieceId: null
+                        },
                         { place: 36 },
-                        { place: 37 },
+                        {
+                            place: 37,
+                            pieceId: null
+                        },
                         { place: 38 },
-                        { place: 39 },
+                        {
+                            place: 39,
+                            pieceId: null
+                        },
                         { place: 40 },
                         { place: 41 },
                         {
-                            pieceId: 'R1',
+                            pieceId: 'R-1',
                             place: 42
                         },
                         { place: 43 },
                         {
-                            pieceId: "R2",
+                            pieceId: "R-2",
                             place: 44
                         },
                         { place: 45 },
                         {
-                            pieceId: "R3",
+                            pieceId: "R-3",
                             place: 46
                         },
                         { place: 47 },
                         {
-                            pieceId: "R4",
+                            pieceId: "R-4",
                             place: 48
                         },
                         {
-                            pieceId: "R5",
+                            pieceId: "R-5",
                             place: 49
                         },
+                        { place: 50 },
                         {
-                            place: 50
-                        },
-                        {
-                            pieceId: "R6",
+                            pieceId: "R-6",
                             place: 51
                         },
                         { place: 52 },
                         {
-                            pieceId: "R7",
+                            pieceId: "R-7",
                             place: 53
                         },
                         { place: 54 },
                         {
-                            pieceId: "R8",
+                            pieceId: "R-8",
                             place: 55
                         },
                         { place: 56 },
                         { place: 57 },
                         {
-                            pieceId: "R9",
+                            pieceId: "R-9",
                             place: 58
                         },
                         { place: 59 },
                         {
-                            pieceId: "R10",
+                            pieceId: "R-10",
                             place: 60
                         },
                         { place: 61 },
                         {
-                            pieceId: "R11",
+                            pieceId: "R-11",
                             place: 62
                         },
                         { place: 63 },
                         {
-                            pieceId: "R12",
+                            pieceId: "R-12",
                             place: 64
                         }
                     ],
@@ -273,6 +366,8 @@ const joinTable = (data, socket) => __awaiter(void 0, void 0, void 0, function* 
                     activePlayer: 1,
                     currentTurnSeatIndex: null,
                     winnerSeatIndex: null,
+                    redTotalLose: 11,
+                    blackTotalLose: 0,
                     gameStatus: gameStatus_1.GAME_STATUS.WAITING
                 };
                 yield (0, redisOption_1.redisSet)(`${redisConstant_1.REDIS_EVENT_NAME.TABLE}:${generateTableId}`, data);
@@ -290,6 +385,13 @@ const joinTable = (data, socket) => __awaiter(void 0, void 0, void 0, function* 
                     logger_1.logger.info(`END joinTable :::: ${JSON.stringify(data.data)}`);
                     return;
                 }
+                let findUser = yield (0, redisOption_1.redisGet)(`${redisConstant_1.REDIS_EVENT_NAME.USER}:${_id}`);
+                findUser = JSON.parse(findUser);
+                if (findUser) {
+                    findUser.tableId = findTable._id;
+                }
+                yield (0, redisOption_1.redisDel)(`${redisConstant_1.REDIS_EVENT_NAME.USER}:${_id}`);
+                yield (0, redisOption_1.redisSet)(`${redisConstant_1.REDIS_EVENT_NAME.USER}:${_id}`, findUser);
                 let queue = yield (0, redisOption_1.redisGet)(redisConstant_1.REDIS_EVENT_NAME.QUEUE);
                 queue = JSON.parse(queue);
                 if (playWithBot == false) {
@@ -307,7 +409,9 @@ const joinTable = (data, socket) => __awaiter(void 0, void 0, void 0, function* 
                 data = {
                     eventName: socketEventName_1.SOCKET_EVENT_NAME.JOIN_TABLE,
                     data: {
-                        data: findTable,
+                        tableId: findTable._id,
+                        playerData: findTable.playerInfo,
+                        tableData: findTable.tableData,
                         message: "ok"
                     },
                     socket
@@ -319,6 +423,8 @@ const joinTable = (data, socket) => __awaiter(void 0, void 0, void 0, function* 
                         timer: bullTimer_1.BULL_TIMER.JOIN_BOT_TIMER
                     };
                     (0, joinBotQueue_1.joinBotQueue)(data, socket);
+                    logger_1.logger.info(`END joinTable :::: ${JSON.stringify(data)}`);
+                    return;
                 }
                 logger_1.logger.info(`END joinTable :::: ${JSON.stringify(data.data)}`);
                 return;

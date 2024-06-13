@@ -9,7 +9,7 @@ const sendToSocketIdEmmiter = (data) => {
         __1.io.to(data.socket.id).emit(data.eventName, data.data);
     }
     catch (error) {
-        logger_1.logger.error(`CATCH_ERROR sendToSocketIdEmmiter :: ${data} , ${error}`);
+        logger_1.logger.error(`CATCH_ERROR sendToSocketIdEmmiter :: ${error}`);
     }
 };
 exports.sendToSocketIdEmmiter = sendToSocketIdEmmiter;
@@ -19,7 +19,7 @@ const sendToRoomEmmiter = (data) => {
         __1.io.to(data.data._id).emit(data.eventName, data.data);
     }
     catch (error) {
-        logger_1.logger.error(`CATCH_ERROR sendToSocketIdEmmiter :: ${data} , ${error}`);
+        logger_1.logger.error(`CATCH_ERROR sendToSocketIdEmmiter :: ${error}`);
     }
 };
 exports.sendToRoomEmmiter = sendToRoomEmmiter;

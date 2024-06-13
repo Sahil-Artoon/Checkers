@@ -5,6 +5,7 @@ import { SOCKET_EVENT_NAME } from "../constant/socketEventName";
 import { joinTable } from "../playing/joinTable";
 import { playGame } from "../playing/play";
 import { move } from "../playing/move";
+import { reJoin } from "../playing/reJoin";
 const eventHandler = async (socket: Socket) => {
     try {
         socket.onAny((eventName: String, data: any) => {
@@ -21,6 +22,9 @@ const eventHandler = async (socket: Socket) => {
                     break;
                 case SOCKET_EVENT_NAME.MOVE:
                     move(data, socket);
+                    break;
+                case SOCKET_EVENT_NAME.RE_JOIN:
+                    reJoin(data, socket);
                     break;
             }
         })

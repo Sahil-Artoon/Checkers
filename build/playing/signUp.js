@@ -48,8 +48,6 @@ const signUp = (data, socket) => __awaiter(void 0, void 0, void 0, function* () 
             isBot,
             tableId: ""
         };
-        logger_1.logger.info(`signUp Data ${data}`);
-        console.log("Sign Up", data);
         yield (0, redisOption_1.redisSet)(`${redisConstant_1.REDIS_EVENT_NAME.USER}:${_id}`, data);
         let User = yield (0, redisOption_1.redisGet)(`${redisConstant_1.REDIS_EVENT_NAME.USER}:${_id}`);
         User = JSON.parse(User);

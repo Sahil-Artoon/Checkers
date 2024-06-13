@@ -1,3 +1,5 @@
+import { reStartQueue } from "../bull/Queue/reStartQueue"
+import { GAME_STATUS } from "../constant/gameStatus"
 import { REDIS_EVENT_NAME } from "../constant/redisConstant"
 import { SOCKET_EVENT_NAME } from "../constant/socketEventName"
 import { sendToRoomEmmiter, sendToSocketIdEmmiter } from "../eventEmmitter"
@@ -25,13 +27,11 @@ const move = async (data: any, socket: any) => {
             return;
         }
         let { movePiece, tableId, movePosition, userId, dataOfPlay } = data
-        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         console.log(`movePiece :::: ${movePiece}`)
         console.log(`tableId :::: ${tableId}`)
         console.log(`movePosition :::: ${movePosition}`)
         console.log(`userId :::: ${userId}`)
         console.log("dataOfPlay :::: ", dataOfPlay)
-        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
         let parts = movePiece.split("-");
         let movePieceBox = parts[1];
@@ -75,7 +75,6 @@ const move = async (data: any, socket: any) => {
                     }
                 }
             }
-            console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
             console.log("dataOfplay.length === :::: ", dataOfPlay.length)
             for (let i = 0; i < dataOfPlay.length; i++) {
                 console.log(`This is ${dataOfPlay[i]} And Push Is :::: ${dataOfPlay[i].push} `)
@@ -123,12 +122,28 @@ const move = async (data: any, socket: any) => {
                         sendToRoomEmmiter(data)
                     }
                     let checkWinnerOrNot = await checkWinner(findTable._id)
-                    console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
                     console.log(`This is checkWinnerOrNot :::: `, checkWinnerOrNot)
-                    console.log('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
                     if (checkWinnerOrNot == 0) {
                         return changeTurn(findTable._id, socket)
                     } else {
+                        findTable.gameStatus = GAME_STATUS.WINNER
+                        findTable.winnerUserId = checkWinnerOrNot
+                        await redisDel(`${REDIS_EVENT_NAME.TABLE}:${findTable._id}`)
+                        await redisSet(`${REDIS_EVENT_NAME.TABLE}:${findTable._id}`, findTable)
+                        let userOne: any = await redisGet(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[0].userId}`)
+                        userOne = JSON.parse(userOne)
+                        if (userOne) {
+                            userOne.tableId = ""
+                        }
+                        await redisDel(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[0].userId}`)
+                        await redisSet(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[0].userId}`, userOne)
+                        let userTwo: any = await redisGet(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[1].userId}`)
+                        userTwo = JSON.parse(userTwo)
+                        if (userTwo) {
+                            userTwo.tableId = ""
+                        }
+                        await redisDel(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[1].userId}`)
+                        await redisSet(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[1].userId}`, userTwo)
                         data = {
                             eventName: SOCKET_EVENT_NAME.WINNER,
                             data: {
@@ -138,13 +153,14 @@ const move = async (data: any, socket: any) => {
                             }
                         }
                         sendToRoomEmmiter(data)
-                        return;
+                        data = {
+                            tableId: findTable._id,
+                            timer: 3000
+                        }
+                        reStartQueue(data, socket)
                     }
                 }
             }
-            console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-
-
         }
     } catch (error) {
         logger.error(`CATCH_ERROR move :::: ${error}`)

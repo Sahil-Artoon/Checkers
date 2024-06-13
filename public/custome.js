@@ -175,8 +175,35 @@ const joinTable = (data) => {
     console.log(`joinTable :::: DATA :::: ${JSON.stringify(data)}`)
     if (data.message == "ok") {
         tableId = data.tableId
+        console.log("Data.message", data.message)
+        console.log("data.playerData.length :::", data.playerData.length)
+        let tableData = data.tableData
+        let ele = document.getElementsByClassName("cell")
+        for (let i = 0; i < tableData.length; i++) {
+            if (tableData[i].pieceId) {
+                if (tableData[i].pieceId != null) {
+                    if (tableData[i].pieceId.split('-')[0] == "R") {
+                        let img = document.createElement('img')
+                        img.src = 'image/red.png';
+                        img.alt = 'red-piece';
+                        img.className = 'piece red-piece';
+                        img.id = tableData[i].pieceId;
+                        ele[i].appendChild(img);
+                    }
+                    if (tableData[i].pieceId.split('-')[0] == "B") {
+                        let img = document.createElement('img')
+                        img.src = 'image/black.png';
+                        img.alt = 'black-piece';
+                        img.className = 'piece black-piece';
+                        img.id = tableData[i].pieceId;
+                        ele[i].appendChild(img);
+                    }
+                }
+            }
+        }
         if (data.playerData.length == 1) {
             if (data.playerData[0].userId == userId) {
+                console.log("This is Inside userId match ::::")
                 color = data.playerData[0].color
                 data = {
                     tableId: data.tableId,
@@ -319,20 +346,6 @@ const move = (data) => {
     }
 }
 
-
-// const move = (data) => {
-//     console.log(`move :::: DATA :::: ${JSON.stringify(data)}`)
-//     if (data.message == "ok") {
-//         if (data.removePiece) {
-//             let img = document.getElementById(`D-${data.removePiece}`).querySelector(`img`)
-//             document.getElementById(`D-${data.removePiece}`).removeChild(img)
-//         }
-//         let img = document.getElementById(`${data.emptyBoxId}`).querySelector(`img`)
-//         document.getElementById(`${data.emptyBoxId}`).removeChild(img)
-//         document.getElementById(`${data.addBoxId}`).appendChild(img)
-//     }
-// }
-
 const king = (data) => {
     console.log(`king :::: DATA :::: ${JSON.stringify(data)}`)
     if (data.message == "ok") {
@@ -359,6 +372,76 @@ const winner = (data) => {
             document.getElementById('time').innerHTML = `You Win ${userName}`
         } else {
             document.getElementById('time').innerHTML = `You Lose ${userName}`
+        }
+    }
+}
+
+const reStart = (data) => {
+    console.log(`reStart :::: DATA ${JSON.stringify(data)}`)
+    if (data.message == "ok") {
+        sessionStorage.removeItem('USER_TABLE');
+        window.location.reload()
+    }
+}
+
+const reJoin = (data) => {
+    console.log(`reJoin :::: DATA ${JSON.stringify(data)}`)
+    if (data.message == "ok") {
+        if (data.gameStatus == "WAITING") {
+            if (data.tableDelete == true) {
+                sessionStorage.removeItem('USER_TABLE');
+                window.location.reload()
+            }
+        }
+        if (data.gameStatus == 'ROUND_TIMER') {
+            console.log("THis is inside rejoin ROUND_TIMER")
+            let tableData = data.tableData
+            let ele = document.getElementsByClassName("cell")
+            for (let i = 0; i < tableData.length; i++) {
+                if (tableData[i].pieceId) {
+                    if (tableData[i].pieceId != null) {
+                        if (tableData[i].pieceId.split('-')[0] == "R") {
+                            let img = document.createElement('img')
+                            img.src = 'image/red.png';
+                            img.alt = 'red-piece';
+                            img.className = 'piece red-piece';
+                            img.id = tableData[i].pieceId;
+                            ele[i].appendChild(img);
+                        }
+                        if (tableData[i].pieceId.split('-')[0] == "B") {
+                            let img = document.createElement('img')
+                            img.src = 'image/black.png';
+                            img.alt = 'black-piece';
+                            img.className = 'piece black-piece';
+                            img.id = tableData[i].pieceId;
+                            ele[i].appendChild(img);
+                        }
+                    }
+                }
+            }
+            if (data.playerInfo[0].userId == data.userId) {
+                tableId = data.tableId
+                userId = data.playerInfo[0].userId
+                userName = data.playerInfo[0].userName
+                color = data.playerInfo[0].color
+                document.getElementById('section-1').style.display = "none"
+                document.getElementById('section-2').style.display = "none"
+                document.getElementById('section-3').style.display = "block"
+                document.getElementById('section-4').style.display = "block"
+                document.getElementById('time').innerHTML = 'Round Timer Started'
+            }
+            if (data.playerInfo[1].userId == data.userId) {
+                tableId = data.tableId
+                userId = data.playerInfo[1].userId
+                userName = data.playerInfo[1].userName
+                color = data.playerInfo[1].color
+                document.getElementById('section-1').style.display = "none"
+                document.getElementById('section-2').style.display = "none"
+                document.getElementById('section-3').style.display = "block"
+                document.getElementById('main-board').style.transform = "rotate(180deg)"
+                document.getElementById('section-4').style.display = "block"
+                document.getElementById('time').innerHTML = 'Round Timer Started'
+            }
         }
     }
 }
@@ -412,5 +495,31 @@ socket.onAny((eventName, data) => {
         case "WINNER":
             winner(data)
             break;
+        case "RE_START":
+            reStart(data)
+            break;
+        case "RE_JOIN":
+            reJoin(data)
+            break;
     }
 })
+
+let findTable = getSession('USER_TABLE')
+if (findTable) {
+    let data = {
+        eventName: 'RE_JOIN',
+        data: {
+            tableId: findTable.tableId,
+            userId: findTable.userId
+        }
+    }
+    sendEmmiter(data)
+} else {
+    let findUser = getSession('USER')
+    if (findUser) {
+        userId = findUser._id
+        userName = findUser.userName
+        document.getElementById('section-1').style.display = "none"
+        document.getElementById('section-2').style.display = "block"
+    }
+}

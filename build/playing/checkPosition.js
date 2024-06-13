@@ -1,18 +1,20 @@
-import { logger } from "../logger"
-
-const checkPosition = (p: any, place: any, color: any) => {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.checkPosition = void 0;
+const logger_1 = require("../logger");
+const checkPosition = (p, place, color) => {
     try {
-        logger.info(`START checkPosition :::: Position : ${p} AND Place : ${place} And Color : ${color}`)
+        logger_1.logger.info(`START checkPosition :::: Position : ${p} AND Place : ${place} And Color : ${color}`);
         if (color == 'red') {
-            console.log("This is Inside color red")
-            const placeMapping: any = {
+            console.log("This is Inside color red");
+            const placeMapping = {
                 1: [], 3: [], 5: [], 7: [], 10: [1, 3], 12: [3, 5], 14: [5, 7], 16: [7],
                 17: [10], 19: [10, 12], 21: [12, 14], 23: [14, 16], 26: [17, 19], 28: [19, 21],
                 30: [21, 23], 32: [23], 33: [26], 35: [26, 28], 37: [28, 30], 39: [30, 32],
                 42: [33, 35], 44: [35, 37], 46: [37, 39], 48: [39], 49: [42], 51: [42, 44],
                 53: [44, 46], 55: [46, 48], 58: [49, 51], 60: [51, 53], 62: [53, 55], 64: [55]
             };
-            const pieceCheckMapping: any = {
+            const pieceCheckMapping = {
                 64: [{ check: 55, push: 46 }],
                 62: [{ check: 53, push: 44 }, { check: 55, push: 48 }],
                 60: [{ check: 51, push: 42 }, { check: 53, push: 46 }],
@@ -46,37 +48,37 @@ const checkPosition = (p: any, place: any, color: any) => {
                 3: [],
                 1: []
             };
-            let arr: any = [];
+            let arr = [];
             if (pieceCheckMapping[p]) {
-                pieceCheckMapping[p].forEach((item: any) => {
-                    if (place[item.check - 1]?.pieceId?.split("-")[0] == "B") {
+                pieceCheckMapping[p].forEach((item) => {
+                    var _a, _b;
+                    if (((_b = (_a = place[item.check - 1]) === null || _a === void 0 ? void 0 : _a.pieceId) === null || _b === void 0 ? void 0 : _b.split("-")[0]) == "B") {
                         if (place[item.push - 1].pieceId == null) {
                             let data = {
                                 check: item.check,
                                 push: item.push
-                            }
+                            };
                             arr.push(data);
                         }
                     }
                 });
             }
             if (placeMapping[p]) {
-                placeMapping[p].forEach((index: any) => {
+                placeMapping[p].forEach((index) => {
                     if (!place[index - 1].pieceId) {
                         let data = {
                             check: 0,
                             push: index
-                        }
+                        };
                         arr.push(data);
                     }
                 });
             }
             return arr;
         }
-
         if (color == 'black') {
-            console.log("This is Inside color Black")
-            let placeMapping: any = {
+            console.log("This is Inside color Black");
+            let placeMapping = {
                 1: [10],
                 3: [10, 12],
                 5: [12, 14],
@@ -110,7 +112,7 @@ const checkPosition = (p: any, place: any, color: any) => {
                 62: [],
                 64: []
             };
-            const resultMapping: any = {
+            const resultMapping = {
                 1: [{ check: 10, push: 19 }],
                 3: [{ check: 10, push: 17 }, { check: 12, push: 21 }],
                 5: [{ check: 12, push: 19 }, { check: 14, push: 23 }],
@@ -144,48 +146,46 @@ const checkPosition = (p: any, place: any, color: any) => {
                 62: [],
                 64: []
             };
-
-            let arr: any = [];
+            let arr = [];
             if (placeMapping[p]) {
-                resultMapping[p].forEach((item: any) => {
-                    if (place[item.check - 1]?.pieceId?.split("-")[0] == "R") {
+                resultMapping[p].forEach((item) => {
+                    var _a, _b;
+                    if (((_b = (_a = place[item.check - 1]) === null || _a === void 0 ? void 0 : _a.pieceId) === null || _b === void 0 ? void 0 : _b.split("-")[0]) == "R") {
                         if (place[item.push - 1].pieceId == null) {
                             let data = {
                                 check: item.check,
                                 push: item.push
-                            }
+                            };
                             arr.push(data);
                         }
                     }
                 });
             }
             if (placeMapping[p]) {
-                placeMapping[p].forEach((index: any) => {
+                placeMapping[p].forEach((index) => {
                     if (!place[index - 1].pieceId) {
                         let data = {
                             check: 0,
                             push: index
-                        }
+                        };
                         arr.push(data);
                     }
                 });
             }
             return arr;
         }
-
         if (color == 'redKing') {
-            console.log(":::::::::::::::::::::::::::::::::::::::::::::::")
-            console.log("This is Inside color redKing")
-            console.log(":::::::::::::::::::::::::::::::::::::::::::::::")
-            const placeMapping: any = {
+            console.log(":::::::::::::::::::::::::::::::::::::::::::::::");
+            console.log("This is Inside color redKing");
+            console.log(":::::::::::::::::::::::::::::::::::::::::::::::");
+            const placeMapping = {
                 1: [10], 3: [10, 12], 5: [12, 14], 7: [14, 16], 10: [1, 3, 17, 19], 12: [3, 5, 19, 21], 14: [5, 7, 21, 23], 16: [7, 23],
                 17: [10, 26], 19: [10, 12, 26, 28], 21: [12, 14, 28, 30], 23: [14, 16, 30, 32], 26: [17, 19, 33, 35], 28: [19, 21, 35, 37],
                 30: [21, 23, 37, 39], 32: [23, 39], 33: [26, 33], 35: [26, 28, 42, 44], 37: [28, 30, 44, 46], 39: [30, 32, 46, 48],
                 42: [33, 35, 49, 51], 44: [35, 37, 51, 53], 46: [37, 39, 53, 55], 48: [39, 55], 49: [42, 58], 51: [42, 44, 58, 60],
                 53: [44, 46, 60, 62], 55: [46, 48, 62, 64], 58: [49, 51], 60: [51, 53], 62: [53, 55], 64: [55]
             };
-
-            const pieceCheckMapping: any = {
+            const pieceCheckMapping = {
                 64: [{ check: 55, push: 46 }],
                 62: [{ check: 53, push: 44 }, { check: 55, push: 48 }],
                 60: [{ check: 51, push: 42 }, { check: 53, push: 46 }],
@@ -219,46 +219,44 @@ const checkPosition = (p: any, place: any, color: any) => {
                 3: [{ check: 12, push: 21 }, { check: 10, push: 17 }],
                 1: [{ check: 10, push: 19 }]
             };
-
-            let arr: any = [];
+            let arr = [];
             if (pieceCheckMapping[p]) {
-                pieceCheckMapping[p].forEach((item: any) => {
-                    if (place[item.check - 1]?.pieceId?.split("-")[0] == "B") {
+                pieceCheckMapping[p].forEach((item) => {
+                    var _a, _b;
+                    if (((_b = (_a = place[item.check - 1]) === null || _a === void 0 ? void 0 : _a.pieceId) === null || _b === void 0 ? void 0 : _b.split("-")[0]) == "B") {
                         if (place[item.push - 1].pieceId == null) {
                             let data = {
                                 check: item.check,
                                 push: item.push
-                            }
+                            };
                             arr.push(data);
                         }
                     }
                 });
             }
             if (placeMapping[p]) {
-                placeMapping[p].forEach((index: any) => {
+                placeMapping[p].forEach((index) => {
                     if (!place[index - 1].pieceId) {
                         let data = {
                             check: 0,
                             push: index
-                        }
+                        };
                         arr.push(data);
                     }
                 });
             }
             return arr;
         }
-
         if (color == 'blackKing') {
-            console.log("This is Inside color blackKing")
-            const placeMapping: any = {
+            console.log("This is Inside color blackKing");
+            const placeMapping = {
                 1: [10], 3: [10, 12], 5: [12, 14], 7: [14, 16], 10: [1, 3, 17, 19], 12: [3, 5, 19, 21], 14: [5, 7, 21, 23], 16: [7, 23],
                 17: [10, 26], 19: [10, 12, 26, 28], 21: [12, 14, 28, 30], 23: [14, 16, 30, 32], 26: [17, 19, 33, 35], 28: [19, 21, 35, 37],
                 30: [21, 23, 37, 39], 32: [23, 39], 33: [26, 33], 35: [26, 28, 42, 44], 37: [28, 30, 44, 46], 39: [30, 32, 46, 48],
                 42: [33, 35, 49, 51], 44: [35, 37, 51, 53], 46: [37, 39, 53, 55], 48: [39, 55], 49: [42, 58], 51: [42, 44, 58, 60],
                 53: [44, 46, 60, 62], 55: [46, 48, 62, 64], 58: [49, 51], 60: [51, 53], 62: [53, 55], 64: [55]
             };
-
-            const pieceCheckMapping: any = {
+            const pieceCheckMapping = {
                 64: [{ check: 55, push: 46 }],
                 62: [{ check: 53, push: 44 }, { check: 55, push: 48 }],
                 60: [{ check: 51, push: 42 }, { check: 53, push: 46 }],
@@ -292,36 +290,37 @@ const checkPosition = (p: any, place: any, color: any) => {
                 3: [{ check: 12, push: 21 }, { check: 10, push: 17 }],
                 1: [{ check: 10, push: 19 }]
             };
-
-            let arr: any = [];
+            let arr = [];
             if (pieceCheckMapping[p]) {
-                pieceCheckMapping[p].forEach((item: any) => {
-                    if (place[item.check - 1]?.pieceId?.split("-")[0] == "R") {
+                pieceCheckMapping[p].forEach((item) => {
+                    var _a, _b;
+                    if (((_b = (_a = place[item.check - 1]) === null || _a === void 0 ? void 0 : _a.pieceId) === null || _b === void 0 ? void 0 : _b.split("-")[0]) == "R") {
                         if (place[item.push - 1].pieceId == null) {
                             let data = {
                                 check: item.check,
                                 push: item.push
-                            }
+                            };
                             arr.push(data);
                         }
                     }
                 });
             }
             if (placeMapping[p]) {
-                placeMapping[p].forEach((index: any) => {
+                placeMapping[p].forEach((index) => {
                     if (!place[index - 1].pieceId) {
                         let data = {
                             check: 0,
                             push: index
-                        }
+                        };
                         arr.push(data);
                     }
                 });
             }
             return arr;
         }
-    } catch (error) {
-        logger.error(`CATCH_ERROR checkPosition :::: ${error}`)
     }
-}
-export { checkPosition }
+    catch (error) {
+        logger_1.logger.error(`CATCH_ERROR checkPosition :::: ${error}`);
+    }
+};
+exports.checkPosition = checkPosition;

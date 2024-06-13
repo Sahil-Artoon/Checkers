@@ -11,6 +11,8 @@ const SOCKET_EVENT_NAME = {
     CHANGE_TURN: "CHANGE_TURN",
     KING: "KING",
     WINNER: "WINNER",
+    RE_START: "RE_START",
+    RE_JOIN: "RE_JOIN"
 }
 
 export { SOCKET_EVENT_NAME }

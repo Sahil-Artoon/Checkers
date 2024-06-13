@@ -45,6 +45,22 @@ const joinTable = async (data: any, socket: any) => {
             logger.info(`END joinTable :::: ${JSON.stringify(data.data)}`)
             return;
         }
+
+        if (findUser) {
+            if (findUser.tableId != "") {
+                data = {
+                    eventName: SOCKET_EVENT_NAME.POP_UP,
+                    data: {
+                        message: `User already Play.`
+                    },
+                    socket
+                }
+                sendToSocketIdEmmiter(data)
+                logger.info(`END joinTable :::: ${JSON.stringify(data.data)}`)
+                return;
+            }
+        }
+
         if (data?.tableId) {
             console.log(":::::::::::::::::::::::::::::::")
             console.log("Inside Table Id ")
@@ -64,6 +80,13 @@ const joinTable = async (data: any, socket: any) => {
                 await redisSet(`${REDIS_EVENT_NAME.TABLE}:${findTable._id}`, findTable)
                 findTable = await redisGet(`${REDIS_EVENT_NAME.TABLE}:${findTable._id}`)
                 findTable = JSON.parse(findTable)
+                let findUser: any = await redisGet(`${REDIS_EVENT_NAME.USER}:${_id}`)
+                findUser = JSON.parse(findUser)
+                if (findUser) {
+                    findUser.tableId = findTable._id
+                }
+                await redisDel(`${REDIS_EVENT_NAME.USER}:${_id}`)
+                await redisSet(`${REDIS_EVENT_NAME.USER}:${_id}`, findUser)
                 data = {
                     eventName: SOCKET_EVENT_NAME.ROUND_TIMER,
                     data: {
@@ -116,6 +139,13 @@ const joinTable = async (data: any, socket: any) => {
                     await redisSet(`${REDIS_EVENT_NAME.TABLE}:${findTable._id}`, findTable)
                     findTable = await redisGet(`${REDIS_EVENT_NAME.TABLE}:${findTable._id}`)
                     findTable = JSON.parse(findTable)
+                    let findUser: any = await redisGet(`${REDIS_EVENT_NAME.USER}:${_id}`)
+                    findUser = JSON.parse(findUser)
+                    if (findUser) {
+                        findUser.tableId = findTable._id
+                    }
+                    await redisDel(`${REDIS_EVENT_NAME.USER}:${_id}`)
+                    await redisSet(`${REDIS_EVENT_NAME.USER}:${_id}`, findUser)
                     if (isBot == false) {
                         socket.join(findTable._id)
                         data = {
@@ -123,6 +153,7 @@ const joinTable = async (data: any, socket: any) => {
                             data: {
                                 tableId: findTable._id,
                                 playerData: findTable.playerInfo,
+                                tableData: findTable.tableData,
                                 message: "ok"
                             },
                             socket
@@ -345,7 +376,13 @@ const joinTable = async (data: any, socket: any) => {
                     logger.info(`END joinTable :::: ${JSON.stringify(data.data)}`)
                     return;
                 }
-
+                let findUser: any = await redisGet(`${REDIS_EVENT_NAME.USER}:${_id}`)
+                findUser = JSON.parse(findUser)
+                if (findUser) {
+                    findUser.tableId = findTable._id
+                }
+                await redisDel(`${REDIS_EVENT_NAME.USER}:${_id}`)
+                await redisSet(`${REDIS_EVENT_NAME.USER}:${_id}`, findUser)
                 let queue: any = await redisGet(REDIS_EVENT_NAME.QUEUE)
                 queue = JSON.parse(queue)
                 if (playWithBot == false) {
@@ -364,6 +401,7 @@ const joinTable = async (data: any, socket: any) => {
                     data: {
                         tableId: findTable._id,
                         playerData: findTable.playerInfo,
+                        tableData: findTable.tableData,
                         message: "ok"
                     },
                     socket

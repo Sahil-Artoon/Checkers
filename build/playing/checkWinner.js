@@ -1,22 +1,35 @@
-import { REDIS_EVENT_NAME } from "../constant/redisConstant"
-import { logger } from "../logger"
-import { redisGet } from "../redisOption"
-
-const checkWinner = async (tableId: any) => {
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.checkWinner = void 0;
+const redisConstant_1 = require("../constant/redisConstant");
+const logger_1 = require("../logger");
+const redisOption_1 = require("../redisOption");
+const checkWinner = (tableId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        logger.info(`START checkWinner :::: DATA :::: ${tableId}`)
-        let findtable: any = await redisGet(`${REDIS_EVENT_NAME.TABLE}:${tableId}`)
-        findtable = JSON.parse(findtable)
+        logger_1.logger.info(`START checkWinner :::: DATA :::: ${tableId}`);
+        let findtable = yield (0, redisOption_1.redisGet)(`${redisConstant_1.REDIS_EVENT_NAME.TABLE}:${tableId}`);
+        findtable = JSON.parse(findtable);
         if (findtable) {
             if (findtable.redTotalLose == 12) {
-                logger.info(`END checkWinner blackWinner :::: AND userId is :::: ${findtable.playerInfo[1].userId}`)
-                return findtable.playerInfo[1].userId
-            } else if (findtable.blackTotalLose == 12) {
-                logger.info(`END checkWinner redWinner :::: AND userId is :::: ${findtable.playerInfo[0].userId}`)
-                return findtable.playerInfo[0].userId
-            } else {
-                logger.info(`END checkWinner noWinner :::: `)
-                return 0
+                logger_1.logger.info(`END checkWinner blackWinner :::: AND userId is :::: ${findtable.playerInfo[1].userId}`);
+                return findtable.playerInfo[1].userId;
+            }
+            else if (findtable.blackTotalLose == 12) {
+                logger_1.logger.info(`END checkWinner redWinner :::: AND userId is :::: ${findtable.playerInfo[0].userId}`);
+                return findtable.playerInfo[0].userId;
+            }
+            else {
+                logger_1.logger.info(`END checkWinner noWinner :::: `);
+                return 0;
             }
             // let tableData = findtable.tableData
             // let p = [1, 3, 5, 7, 10, 12, 14, 16, 17, 13, 21, 23, 26, 28, 30, 32, 33, 35, 37, 39, 42, 44, 46, 48, 48, 51, 53, 55, 58, 60, 62, 64]
@@ -164,7 +177,6 @@ const checkWinner = async (tableId: any) => {
             //         62: [],
             //         64: []
             //     };
-
             //     let arr: any = [];
             //     for (let i = 0; i < p.length; i++) {
             //         if (placeMapping[p[i]]) {
@@ -197,9 +209,9 @@ const checkWinner = async (tableId: any) => {
             //     return arr;
             // }
         }
-    } catch (error) {
-        logger.error(`CATCH_ERROR checkWinner :::: ${error}`)
     }
-}
-
-export { checkWinner }
+    catch (error) {
+        logger_1.logger.error(`CATCH_ERROR checkWinner :::: ${error}`);
+    }
+});
+exports.checkWinner = checkWinner;

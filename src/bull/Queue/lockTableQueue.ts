@@ -24,9 +24,9 @@ const lockTableQueue = async (data: any, socket: any) => {
                     message: "ok"
                 }
             }
-            logger.info(`End lockTableQueue :::: DATA :::: ${JSON.stringify(data)}`)
             sendToRoomEmmiter(data)
         })
+        logger.info(`End lockTableQueue ::::`)
 
     } catch (error) {
         logger.error(`CATCH_ERROR lockTableQueue :::: ${error}`)
