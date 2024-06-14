@@ -8,6 +8,9 @@ import { reJoinValidation } from "../validation/reJoinValidation"
 
 const reJoin = async (data: any, socket: any) => {
     try {
+        console.log(":::::::::::::::::::::::::::::::::::::::::::::::::::")
+        console.log("Socket Id inside Rejoin ::::: ", socket.id)
+        console.log(":::::::::::::::::::::::::::::::::::::::::::::::::::")
         logger.info(`START reJoin :::: DATA :::: ${JSON.stringify(data)}`)
         let checkData: any = await reJoinValidation(data)
         if (checkData?.error) {
@@ -40,6 +43,7 @@ const reJoin = async (data: any, socket: any) => {
         let findTable: any = await redisGet(`${REDIS_EVENT_NAME.TABLE}:${tableId}`)
         findTable = JSON.parse(findTable)
         if (findTable) {
+            // This is Waiting Stage
             if (findTable.gameStatus === GAME_STATUS.WAITING) {
                 if (findTable.activePlayer == 1) {
                     await redisDel(`${REDIS_EVENT_NAME.TABLE}:${tableId}`)
@@ -72,23 +76,85 @@ const reJoin = async (data: any, socket: any) => {
                     return;
                 }
             }
+            // This is RoundTimer
             if (findTable.gameStatus == GAME_STATUS.ROUND_TIMER) {
+                console.log("This is Inside GameStatus ::::: ROUND_TIMER")
                 data = {
                     eventName: SOCKET_EVENT_NAME.RE_JOIN,
                     data: {
                         gameStatus: GAME_STATUS.ROUND_TIMER,
                         message: "ok",
-                        tableId, 
+                        tableId,
                         userId,
                         tableData: findTable.tableData,
                         playerInfo: findTable.playerInfo
                     },
                     socket
                 }
+                socket.join(findTable._id)
                 sendToSocketIdEmmiter(data)
                 logger.info(`END reJoin :::: ${JSON.stringify(data.data)}`)
                 return;
             }
+            // This is Lock_table
+            if (findTable.gameStatus == GAME_STATUS.LOCK_TABLE) {
+                console.log("This is Inside GameStatus ::::: LOCK_TABLE")
+                data = {
+                    eventName: SOCKET_EVENT_NAME.RE_JOIN,
+                    data: {
+                        gameStatus: GAME_STATUS.LOCK_TABLE,
+                        message: "ok",
+                        tableId,
+                        userId,
+                        tableData: findTable.tableData,
+                        playerInfo: findTable.playerInfo
+                    },
+                    socket
+                }
+                socket.join(findTable._id)
+                sendToSocketIdEmmiter(data)
+                logger.info(`END reJoin :::: ${JSON.stringify(data.data)}`)
+                return;
+            }
+
+            if (findTable.gameStatus == GAME_STATUS.PLAYING) {
+                console.log("This is Inside GameStatus ::::: PLAYING")
+                data = {
+                    eventName: SOCKET_EVENT_NAME.RE_JOIN,
+                    data: {
+                        gameStatus: GAME_STATUS.PLAYING,
+                        message: "ok",
+                        tableId,
+                        userId,
+                        table: findTable
+                    },
+                    socket
+                }
+                socket.join(findTable._id)
+                sendToSocketIdEmmiter(data)
+                logger.info(`END reJoin :::: ${JSON.stringify(data.data)}`)
+                return;
+            }
+
+            if (findTable.gameStatus == GAME_STATUS.WINNER) {
+                console.log("This is Inside GameStatus ::::: WINNER")
+                data = {
+                    eventName: SOCKET_EVENT_NAME.RE_JOIN,
+                    data: {
+                        gameStatus: GAME_STATUS.PLAYING,
+                        message: "ok",
+                        tableId,
+                        userId,
+                        table: findTable
+                    },
+                    socket
+                }
+                socket.join(findTable._id)
+                sendToSocketIdEmmiter(data)
+                logger.info(`END reJoin :::: ${JSON.stringify(data.data)}`)
+                return;
+            }
+
         }
     } catch (error) {
         logger.error(`CATCH_ERROR reJoin :::: ${error}`)

@@ -76,6 +76,7 @@ const joinTable = async (data: any, socket: any) => {
                     color: 'black'
                 })
                 findTable.activePlayer = findTable.activePlayer + 1;
+                findTable.gameStatus = GAME_STATUS.ROUND_TIMER;
                 await redisDel(`${REDIS_EVENT_NAME.TABLE}: ${findTable._id}`)
                 await redisSet(`${REDIS_EVENT_NAME.TABLE}:${findTable._id}`, findTable)
                 findTable = await redisGet(`${REDIS_EVENT_NAME.TABLE}:${findTable._id}`)
@@ -135,6 +136,7 @@ const joinTable = async (data: any, socket: any) => {
                         color: 'black'
                     })
                     findTable.activePlayer = findTable.activePlayer + 1;
+                    findTable.gameStatus = GAME_STATUS.ROUND_TIMER;
                     await redisDel(`${REDIS_EVENT_NAME.TABLE}: ${findTable._id}`)
                     await redisSet(`${REDIS_EVENT_NAME.TABLE}:${findTable._id}`, findTable)
                     findTable = await redisGet(`${REDIS_EVENT_NAME.TABLE}:${findTable._id}`)

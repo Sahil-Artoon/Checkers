@@ -4,5 +4,6 @@ const GAME_STATUS = {
     CHECK_TURN: "CHECK_TURN",
     PLAYING: "PLAYING",
     WINNER: "WINNER",
+    LOCK_TABLE: "LOCK_TABLE",
 }
 export { GAME_STATUS }

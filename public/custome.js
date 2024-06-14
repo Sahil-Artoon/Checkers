@@ -47,6 +47,7 @@ document.getElementById('play-with-bot').addEventListener('click', (event) => {
     sendEmmiter(data);
     return;
 })
+
 document.getElementById('play-with-player').addEventListener('click', (event) => {
     event.preventDefault();
     let User = getSession('USER');
@@ -64,7 +65,6 @@ document.getElementById('play-with-player').addEventListener('click', (event) =>
     // document.getElementById('section-2').style.display = "none"
     // document.getElementById('section-3').style.display = "block"
 })
-
 
 const elements = document.querySelectorAll('.wood-dark');
 let currentColor;
@@ -387,12 +387,15 @@ const reStart = (data) => {
 const reJoin = (data) => {
     console.log(`reJoin :::: DATA ${JSON.stringify(data)}`)
     if (data.message == "ok") {
+        // This is For Wating
         if (data.gameStatus == "WAITING") {
             if (data.tableDelete == true) {
                 sessionStorage.removeItem('USER_TABLE');
                 window.location.reload()
             }
         }
+
+        // This is for Round_timer
         if (data.gameStatus == 'ROUND_TIMER') {
             console.log("THis is inside rejoin ROUND_TIMER")
             let tableData = data.tableData
@@ -443,6 +446,170 @@ const reJoin = (data) => {
                 document.getElementById('time').innerHTML = 'Round Timer Started'
             }
         }
+
+        // This is for Lock_Table
+        if (data.gameStatus == 'LOCK_TABLE') {
+            console.log("THis is inside rejoin LOCK_TABLE")
+            let tableData = data.tableData
+            let ele = document.getElementsByClassName("cell")
+            for (let i = 0; i < tableData.length; i++) {
+                if (tableData[i].pieceId) {
+                    if (tableData[i].pieceId != null) {
+                        if (tableData[i].pieceId.split('-')[0] == "R") {
+                            let img = document.createElement('img')
+                            img.src = 'image/red.png';
+                            img.alt = 'red-piece';
+                            img.className = 'piece red-piece';
+                            img.id = tableData[i].pieceId;
+                            ele[i].appendChild(img);
+                        }
+                        if (tableData[i].pieceId.split('-')[0] == "B") {
+                            let img = document.createElement('img')
+                            img.src = 'image/black.png';
+                            img.alt = 'black-piece';
+                            img.className = 'piece black-piece';
+                            img.id = tableData[i].pieceId;
+                            ele[i].appendChild(img);
+                        }
+                    }
+                }
+            }
+            if (data.playerInfo[0].userId == data.userId) {
+                tableId = data.tableId
+                userId = data.playerInfo[0].userId
+                userName = data.playerInfo[0].userName
+                color = data.playerInfo[0].color
+                document.getElementById('section-1').style.display = "none"
+                document.getElementById('section-2').style.display = "none"
+                document.getElementById('section-3').style.display = "block"
+                document.getElementById('section-4').style.display = "block"
+                document.getElementById('time').innerHTML = 'Lock Table'
+            }
+            if (data.playerInfo[1].userId == data.userId) {
+                tableId = data.tableId
+                userId = data.playerInfo[1].userId
+                userName = data.playerInfo[1].userName
+                color = data.playerInfo[1].color
+                document.getElementById('section-1').style.display = "none"
+                document.getElementById('section-2').style.display = "none"
+                document.getElementById('section-3').style.display = "block"
+                document.getElementById('main-board').style.transform = "rotate(180deg)"
+                document.getElementById('section-4').style.display = "block"
+                document.getElementById('time').innerHTML = 'Lock Table'
+            }
+        }
+
+        // This is for PLAYING
+        if (data.gameStatus == "PLAYING") {
+            console.log("THis is inside rejoin LOCK_TABLE")
+            let tableData = data.table.tableData
+            let ele = document.getElementsByClassName("cell")
+            for (let i = 0; i < tableData.length; i++) {
+                if (tableData[i].pieceId) {
+                    if (tableData[i].pieceId != null) {
+                        if (tableData[i].pieceId.split('-')[0] == "R") {
+                            let img = document.createElement('img')
+                            img.src = 'image/red.png';
+                            img.alt = 'red-piece';
+                            img.className = 'piece red-piece';
+                            img.id = tableData[i].pieceId;
+                            ele[i].appendChild(img);
+                        }
+                        if (tableData[i].pieceId.split('-')[0] == "B") {
+                            let img = document.createElement('img')
+                            img.src = 'image/black.png';
+                            img.alt = 'black-piece';
+                            img.className = 'piece black-piece';
+                            img.id = tableData[i].pieceId;
+                            ele[i].appendChild(img);
+                        }
+                    }
+                }
+            }
+            if (data.table.playerInfo[0].userId == data.userId) {
+                tableId = data.tableId
+                userId = data.table.playerInfo[0].userId
+                userName = data.table.playerInfo[0].userName
+                color = data.table.playerInfo[0].color
+                document.getElementById('section-1').style.display = "none"
+                document.getElementById('section-2').style.display = "none"
+                document.getElementById('section-3').style.display = "block"
+                document.getElementById('section-4').style.display = "none"
+            }
+            if (data.table.playerInfo[1].userId == data.userId) {
+                tableId = data.tableId
+                userId = data.table.playerInfo[1].userId
+                userName = data.table.playerInfo[1].userName
+                color = data.table.playerInfo[1].color
+                document.getElementById('section-1').style.display = "none"
+                document.getElementById('section-2').style.display = "none"
+                document.getElementById('section-3').style.display = "block"
+                document.getElementById('main-board').style.transform = "rotate(180deg)"
+                document.getElementById('section-4').style.display = "none"
+            }
+        }
+
+        // This is for WINNER
+        if (data.gameStatus == "WINNER") {
+            console.log("THis is inside rejoin WINNER")
+            let tableData = data.table.tableData
+            let ele = document.getElementsByClassName("cell")
+            for (let i = 0; i < tableData.length; i++) {
+                if (tableData[i].pieceId) {
+                    if (tableData[i].pieceId != null) {
+                        if (tableData[i].pieceId.split('-')[0] == "R") {
+                            let img = document.createElement('img')
+                            img.src = 'image/red.png';
+                            img.alt = 'red-piece';
+                            img.className = 'piece red-piece';
+                            img.id = tableData[i].pieceId;
+                            ele[i].appendChild(img);
+                        }
+                        if (tableData[i].pieceId.split('-')[0] == "B") {
+                            let img = document.createElement('img')
+                            img.src = 'image/black.png';
+                            img.alt = 'black-piece';
+                            img.className = 'piece black-piece';
+                            img.id = tableData[i].pieceId;
+                            ele[i].appendChild(img);
+                        }
+                    }
+                }
+            }
+            if (data.table.playerInfo[0].userId == data.userId) {
+                tableId = data.tableId
+                userId = data.table.playerInfo[0].userId
+                userName = data.table.playerInfo[0].userName
+                color = data.table.playerInfo[0].color
+                document.getElementById('section-1').style.display = "none"
+                document.getElementById('section-2').style.display = "none"
+                document.getElementById('section-3').style.display = "block"
+                document.getElementById('section-4').style.display = "block"
+                document.getElementById('time').innerHTML = `You Win ${userName}`
+                if (data.table.winnerUserId == userId) {
+                    document.getElementById('time').innerHTML = `You Win ${userName}`
+                } else {
+                    document.getElementById('time').innerHTML = `You Lose ${userName}`
+                }
+            }
+            if (data.table.playerInfo[1].userId == data.userId) {
+                tableId = data.tableId
+                userId = data.table.playerInfo[1].userId
+                userName = data.table.playerInfo[1].userName
+                color = data.table.playerInfo[1].color
+                document.getElementById('section-1').style.display = "none"
+                document.getElementById('section-2').style.display = "none"
+                document.getElementById('section-3').style.display = "block"
+                document.getElementById('main-board').style.transform = "rotate(180deg)"
+                document.getElementById('section-4').style.display = "block"
+                document.getElementById('time').innerHTML = `You Win ${userName}`
+                if (data.table.winnerUserId == userId) {
+                    document.getElementById('time').innerHTML = `You Win ${userName}`
+                } else {
+                    document.getElementById('time').innerHTML = `You Lose ${userName}`
+                }
+            }
+        }
     }
 }
 
@@ -489,15 +656,19 @@ socket.onAny((eventName, data) => {
         case "MOVE":
             move(data)
             break;
+
         case "KING":
             king(data)
             break;
+
         case "WINNER":
             winner(data)
             break;
+
         case "RE_START":
             reStart(data)
             break;
+
         case "RE_JOIN":
             reJoin(data)
             break;

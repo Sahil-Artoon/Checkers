@@ -3,6 +3,9 @@ import { io } from "..";
 
 const sendToSocketIdEmmiter = (data: any) => {
     try {
+        console.log("::::::::::::::::::::::::::::::::::::::::::::::::")
+        console.log("Inside sendToSocketIdEmmiter :::::::: ", data.socket.id)
+        console.log("::::::::::::::::::::::::::::::::::::::::::::::::")
         logger.info(`RESPONSE EVENT NAME :: ${data.eventName} DATA :: ${JSON.stringify(data.data)}`)
         io.to(data.socket.id).emit(data.eventName, data.data)
     } catch (error) {

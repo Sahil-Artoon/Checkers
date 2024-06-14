@@ -1,4 +1,5 @@
 import { reStartQueue } from "../bull/Queue/reStartQueue"
+import { BULL_TIMER } from "../constant/bullTimer"
 import { GAME_STATUS } from "../constant/gameStatus"
 import { REDIS_EVENT_NAME } from "../constant/redisConstant"
 import { SOCKET_EVENT_NAME } from "../constant/socketEventName"
@@ -130,20 +131,6 @@ const move = async (data: any, socket: any) => {
                         findTable.winnerUserId = checkWinnerOrNot
                         await redisDel(`${REDIS_EVENT_NAME.TABLE}:${findTable._id}`)
                         await redisSet(`${REDIS_EVENT_NAME.TABLE}:${findTable._id}`, findTable)
-                        let userOne: any = await redisGet(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[0].userId}`)
-                        userOne = JSON.parse(userOne)
-                        if (userOne) {
-                            userOne.tableId = ""
-                        }
-                        await redisDel(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[0].userId}`)
-                        await redisSet(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[0].userId}`, userOne)
-                        let userTwo: any = await redisGet(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[1].userId}`)
-                        userTwo = JSON.parse(userTwo)
-                        if (userTwo) {
-                            userTwo.tableId = ""
-                        }
-                        await redisDel(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[1].userId}`)
-                        await redisSet(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[1].userId}`, userTwo)
                         data = {
                             eventName: SOCKET_EVENT_NAME.WINNER,
                             data: {
@@ -155,7 +142,7 @@ const move = async (data: any, socket: any) => {
                         sendToRoomEmmiter(data)
                         data = {
                             tableId: findTable._id,
-                            timer: 3000
+                            timer: BULL_TIMER.RE_START
                         }
                         reStartQueue(data, socket)
                     }

@@ -8,6 +8,9 @@ import { move } from "../playing/move";
 import { reJoin } from "../playing/reJoin";
 const eventHandler = async (socket: Socket) => {
     try {
+        console.log("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::")
+        console.log("Socket Id :::::::::: ", socket.id)
+        console.log("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::")
         socket.onAny((eventName: String, data: any) => {
             logger.info(`Request :: Event Name is : ${eventName} :: Data : ${JSON.stringify(data)}`);
             switch (eventName) {
