@@ -148,6 +148,18 @@ function handleClick(event) {
 elements.forEach((element) => {
     element.addEventListener('click', handleClick);
 });
+
+const leaveGame = () => {
+    console.log("Leave Game :::::::::::");
+    let data = {
+        eventName: "LEAVE_GAME",
+        data: {
+            userId,
+            tableId
+        }
+    }
+    sendEmmiter(data)
+}
 // :::::::::::: SOCKET ON FUNCTIONS ::::::::::::
 const popUp = (data) => {
     console.log(`popUp :::: DATA :::: ${JSON.stringify(data)}`)
@@ -233,6 +245,7 @@ const joinTable = (data) => {
             document.getElementById('section-2').style.display = "none"
             document.getElementById('section-3').style.display = "block"
             document.getElementById('main-board').style.transform = "rotate(180deg)"
+            document.getElementById('leaveButton').style.transform = "rotate(180deg)"
             document.getElementById('section-4').style.display = "block"
             document.getElementById('time').innerHTML = 'Waiting for Apponet Player'
         }
@@ -250,6 +263,7 @@ const lockTable = (data) => {
     console.log(`lockTable :::: DATA :::: ${JSON.stringify(data)}`)
     if (data.message == "ok") {
         document.getElementById('time').innerHTML = 'Lock Table'
+        document.getElementById('leaveButton').style.display = 'none'
     }
 }
 
@@ -258,6 +272,7 @@ const turn = (data) => {
     let User = getSession('USER');
     console.log("User", User)
     console.log("UserId", data.userId)
+    document.getElementById('leaveButton').style.display = 'block'
     if (User._id == data.userId) {
         document.getElementById('section-4').style.display = 'none'
         // document.getElementById('section-5').style.display = 'block'
@@ -442,6 +457,7 @@ const reJoin = (data) => {
                 document.getElementById('section-2').style.display = "none"
                 document.getElementById('section-3').style.display = "block"
                 document.getElementById('main-board').style.transform = "rotate(180deg)"
+                document.getElementById('leaveButton').style.transform = "rotate(180deg)"
                 document.getElementById('section-4').style.display = "block"
                 document.getElementById('time').innerHTML = 'Round Timer Started'
             }
@@ -452,6 +468,7 @@ const reJoin = (data) => {
             console.log("THis is inside rejoin LOCK_TABLE")
             let tableData = data.tableData
             let ele = document.getElementsByClassName("cell")
+            document.getElementById('leaveButton').style.display = 'none'
             for (let i = 0; i < tableData.length; i++) {
                 if (tableData[i].pieceId) {
                     if (tableData[i].pieceId != null) {
@@ -545,6 +562,7 @@ const reJoin = (data) => {
                 document.getElementById('section-2').style.display = "none"
                 document.getElementById('section-3').style.display = "block"
                 document.getElementById('main-board').style.transform = "rotate(180deg)"
+                document.getElementById('leaveButton').style.transform = "rotate(180deg)"
                 document.getElementById('section-4').style.display = "none"
             }
         }
@@ -601,6 +619,7 @@ const reJoin = (data) => {
                 document.getElementById('section-2').style.display = "none"
                 document.getElementById('section-3').style.display = "block"
                 document.getElementById('main-board').style.transform = "rotate(180deg)"
+                document.getElementById('leaveButton').style.transform = "rotate(180deg)"
                 document.getElementById('section-4').style.display = "block"
                 document.getElementById('time').innerHTML = `You Win ${userName}`
                 if (data.table.winnerUserId == userId) {
@@ -608,6 +627,36 @@ const reJoin = (data) => {
                 } else {
                     document.getElementById('time').innerHTML = `You Lose ${userName}`
                 }
+            }
+        }
+    }
+}
+
+const leave = (data) => {
+    console.log(`Leave :::: ${JSON.stringify(data)}`)
+    if (data.message == "ok") {
+        if (data.gameStatus == "WAITING") {
+            sessionStorage.removeItem('USER_TABLE')
+            window.location.reload()
+        }
+
+        if (data.gameStatus == "ROUND_TIMER") {
+            if (data.userId == userId) {
+                sessionStorage.removeItem('USER_TABLE')
+                window.location.reload()
+            } else {
+                document.getElementById('time').innerHTML = `Waiting for Apponet Player`
+            }
+        }
+
+        if (data.gameStatus == "PLAYING") {
+            if (data.userId == userId) {
+                sessionStorage.removeItem('USER_TABLE')
+                window.location.reload()
+            }
+            if (data.userId != userId) {
+                document.getElementById('section-4').style.display = "block";
+                document.getElementById('time').innerHTML = `${userName} You WIN`;
             }
         }
     }
@@ -671,6 +720,10 @@ socket.onAny((eventName, data) => {
 
         case "RE_JOIN":
             reJoin(data)
+            break;
+
+        case "LEAVE_GAME":
+            leave(data)
             break;
     }
 })

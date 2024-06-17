@@ -215,9 +215,66 @@ input[type="submit"]:hover {
     background-color: #0000005b;
     padding: 25px 20px;
 }
-#section-5,#section-6 {
-    display: none;
+
+
+
+
+
+
+
+/* Section 5 */
+
+.contain {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    /* Space between indicators */
 }
-#section-5,#section-6>div{
+
+.color-black {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.5em;
+    font-family: Arial, sans-serif;
+    color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.color-red {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.5em;
+    font-family: Arial, sans-serif;
+    color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.black-indicator {
+    background-color: #000000;
+}
+
+.red-indicator {
+    background-color: #ff0000;
+}
+
+.number {
+    position: relative;
+    top: -5px;
+    /* Adjust for centering the number */
+}
+
+#leaveButton>button {
+    padding: 10px 20px;
     color: #fff;
+    background-color: red;
+    font-size: medium;
 }

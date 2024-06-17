@@ -128,12 +128,18 @@ const joinTable = async (data: any, socket: any) => {
                 let findTable: any = await redisGet(`${REDIS_EVENT_NAME.TABLE}:${idOfTable}`)
                 findTable = JSON.parse(findTable)
                 if (findTable) {
+                    let color: any;
+                    if (findTable.playerInfo[0].color == "red") {
+                        color = "black"
+                    } else {
+                        color = "red"
+                    }
                     findTable.playerInfo.push({
                         userId: _id,
                         userName,
                         isBot,
                         isActive: true,
-                        color: 'black'
+                        color
                     })
                     findTable.activePlayer = findTable.activePlayer + 1;
                     findTable.gameStatus = GAME_STATUS.ROUND_TIMER;

@@ -45,7 +45,7 @@
         </div>
         <!-- section 3 -->
         <div id="section-3">
-            <div class="board-pera" id="main-board">
+            <div class="board-pera d-flex justify-content-evenly" id="main-board">
                 <div class="board">
                     <!-- Rows 0, 1, 2 -->
                     <div class="cell wood-dark" id="D-1"></div>
@@ -122,6 +122,21 @@
                     <div class="cell wood-dark" id="D-62"></div>
                     <div class="cell wood-light" id="D-63"></div>
                     <div class="cell wood-dark" id="D-64"></div>
+                </div>
+                <div id="section-5" class="d-flex h-100 flex-column justify-content-evenly">
+                    <div id="leaveButton">
+                        <button onclick="leaveGame()">Leave Game</button>
+                    </div>
+                    <div id="score">
+                        <div class="contain">
+                            <div class="color-red black-indicator counter">
+                                <span class="number">0</span>
+                            </div>
+                            <div class="color-black red-indicator counter">
+                                <span class="number">0</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -141,7 +141,7 @@ const reJoin = async (data: any, socket: any) => {
                 data = {
                     eventName: SOCKET_EVENT_NAME.RE_JOIN,
                     data: {
-                        gameStatus: GAME_STATUS.PLAYING,
+                        gameStatus: GAME_STATUS.WINNER,
                         message: "ok",
                         tableId,
                         userId,

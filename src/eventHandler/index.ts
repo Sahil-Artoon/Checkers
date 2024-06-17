@@ -6,6 +6,7 @@ import { joinTable } from "../playing/joinTable";
 import { playGame } from "../playing/play";
 import { move } from "../playing/move";
 import { reJoin } from "../playing/reJoin";
+import { leaveGame } from "../playing/leaveGame";
 const eventHandler = async (socket: Socket) => {
     try {
         console.log("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::")
@@ -28,6 +29,9 @@ const eventHandler = async (socket: Socket) => {
                     break;
                 case SOCKET_EVENT_NAME.RE_JOIN:
                     reJoin(data, socket);
+                    break;
+                case SOCKET_EVENT_NAME.LEAVE_GAME:
+                    leaveGame(data, socket);
                     break;
             }
         })
