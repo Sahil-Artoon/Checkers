@@ -88,6 +88,9 @@ const playGame = async (data: any, socket: any) => {
                     }
                 }
                 sendToRoomEmmiter(data)
+                if (isBot == true) {
+                    return data.data
+                }
             } else {
                 logger.error("sendPositon :::: Empty :::: !!!")
             }

@@ -1,12 +1,14 @@
+import { botPlay } from "../bot/botPlay"
 import { REDIS_EVENT_NAME } from "../constant/redisConstant"
 import { SOCKET_EVENT_NAME } from "../constant/socketEventName"
 import { sendToRoomEmmiter } from "../eventEmmitter"
 import { logger } from "../logger"
 import { redisDel, redisGet, redisSet } from "../redisOption"
 
-const changeTurn = async (tableId: any, socket: any) => {
+const changeTurn = async (data: any, socket: any) => {
     try {
-        logger.info(`START changeTurn :::: DATA :::: ${tableId}`)
+        logger.info(`START changeTurn :::: DATA :::: ${JSON.stringify(data)}`)
+        let { tableId, lastMove }: any = data
         if (tableId) {
             let findTable: any = await redisGet(`${REDIS_EVENT_NAME.TABLE}:${tableId}`)
             findTable = JSON.parse(findTable)
@@ -18,7 +20,7 @@ const changeTurn = async (tableId: any, socket: any) => {
                     table.currentTurnUserId = table?.playerInfo[1].userId
                     await redisDel(`${REDIS_EVENT_NAME.TABLE}:${table._id}`)
                     await redisSet(`${REDIS_EVENT_NAME.TABLE}:${table._id}`, table)
-                    let data = {
+                    let data: any = {
                         eventName: SOCKET_EVENT_NAME.CHANGE_TURN,
                         data: {
                             _id: table._id,
@@ -29,6 +31,15 @@ const changeTurn = async (tableId: any, socket: any) => {
                         }
                     }
                     sendToRoomEmmiter(data)
+                    if (findTable.playerInfo[1].isBot) {
+                        data = {
+                            tableId,
+                            userId: table.playerInfo[1].userId,
+                            firstTurn: false,
+                            lastMove
+                        }
+                        botPlay(data, socket)
+                    }
                 }
                 if (findTable.currentTurnSeatIndex == 1) {
                     let table: any = await redisGet(`${REDIS_EVENT_NAME.TABLE}:${tableId}`)
@@ -48,6 +59,15 @@ const changeTurn = async (tableId: any, socket: any) => {
                         }
                     }
                     sendToRoomEmmiter(data)
+                    if (findTable.playerInfo[0].isBot) {
+                        let data = {
+                            tableId,
+                            userId: table.playerInfo[1].userId,
+                            firstTurn: false,
+                            lastMove
+                        }
+                        botPlay(data, socket)
+                    }
                 }
             }
         }

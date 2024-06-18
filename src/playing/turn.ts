@@ -1,3 +1,4 @@
+import { botPlay } from "../bot/botPlay"
 import { GAME_STATUS } from "../constant/gameStatus"
 import { REDIS_EVENT_NAME } from "../constant/redisConstant"
 import { SOCKET_EVENT_NAME } from "../constant/socketEventName"
@@ -10,11 +11,11 @@ const turn = async (tableId: any, socket: any) => {
         logger.info(`START turn :::: DATA ${JSON.stringify(tableId)}`)
         const randomNumber = Math.floor(Math.random() * 100) + 1;
         let ramdomNumberForGiveUserTurn = 1;
-        if (randomNumber % 2 == 1) {
-            ramdomNumberForGiveUserTurn = 1;
-        } else {
-            ramdomNumberForGiveUserTurn = 0;
-        }
+        // if (randomNumber % 2 == 1) {
+        //     ramdomNumberForGiveUserTurn = 1;
+        // } else {
+        //     ramdomNumberForGiveUserTurn = 0;
+        // }
         console.log("TURN of THIS PLAYER ", ramdomNumberForGiveUserTurn)
         let findTable: any = await redisGet(`${REDIS_EVENT_NAME.TABLE}:${tableId}`)
         findTable = JSON.parse(findTable)
@@ -34,6 +35,16 @@ const turn = async (tableId: any, socket: any) => {
                 }
             }
             sendToRoomEmmiter(data)
+            if (ramdomNumberForGiveUserTurn == 1) {
+                if (findTable.playerInfo[1].isBot) {
+                    let data = {
+                        tableId,
+                        userId: findTable.playerInfo[1].userId,
+                        firstTurn: true
+                    }
+                    botPlay(data, socket)
+                }
+            }
         }
     } catch (error) {
         logger.error(`CATCH_ERROR turn :::: ${error}`)

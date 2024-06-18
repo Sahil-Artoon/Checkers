@@ -125,7 +125,11 @@ const move = async (data: any, socket: any) => {
                     let checkWinnerOrNot = await checkWinner(findTable._id)
                     console.log(`This is checkWinnerOrNot :::: `, checkWinnerOrNot)
                     if (checkWinnerOrNot == 0) {
-                        return changeTurn(findTable._id, socket)
+                        data = {
+                            tableId: findTable._id,
+                            lastMove: moviePositionBox
+                        }
+                        return changeTurn(data, socket)
                     } else {
                         findTable.gameStatus = GAME_STATUS.WINNER
                         findTable.winnerUserId = checkWinnerOrNot
