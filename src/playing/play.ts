@@ -71,12 +71,33 @@ const playGame = async (data: any, socket: any) => {
             }
             console.log("This is NumberOfBox :::", numberOfBox)
             let place = findTable.tableData
-            let sendPosition: any = await checkPosition(numberOfBox, place, color)
-            console.log("This is SendPosition :::", sendPosition)
-            if (sendPosition) {
-                data = {
-                    eventName: SOCKET_EVENT_NAME.SEND_PLACE,
-                    data: {
+            if (isBot == false) {
+                let sendPosition: any = await checkPosition(numberOfBox, place, color, isBot)
+                console.log("This is SendPosition :::", sendPosition)
+                if (sendPosition) {
+                    data = {
+                        eventName: SOCKET_EVENT_NAME.SEND_PLACE,
+                        data: {
+                            _id: tableId,
+                            tableId,
+                            userId,
+                            userName,
+                            isBot,
+                            position,
+                            sendPosition,
+                            message: "ok"
+                        }
+                    }
+                    sendToRoomEmmiter(data)
+                } else {
+                    logger.error("sendPositon :::: Empty :::: !!!")
+                }
+            }
+            if (isBot == true) {
+                let sendPosition: any = await checkPosition(numberOfBox, place, color, isBot)
+                console.log("This is SendPosition :::", sendPosition)
+                if (sendPosition) {
+                    data = {
                         _id: tableId,
                         tableId,
                         userId,
@@ -86,14 +107,12 @@ const playGame = async (data: any, socket: any) => {
                         sendPosition,
                         message: "ok"
                     }
+                    return data
+                } else {
+                    logger.error("sendPositon :::: Empty :::: !!!")
                 }
-                sendToRoomEmmiter(data)
-                if (isBot == true) {
-                    return data.data
-                }
-            } else {
-                logger.error("sendPositon :::: Empty :::: !!!")
             }
+
         }
     } catch (error) {
         logger.error(`CATCH_ERROR playGame :::: ${error}`)

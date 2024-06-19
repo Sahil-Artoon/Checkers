@@ -4,6 +4,7 @@ const QUEUE_EVENT = {
     LOCK_TABLE: 'LOCK_TABLE',
     RE_START: "RE_START",
     DELETE_TABLE: "DELETE_TABLE",
+    BOT_PLAY: "BOT_PLAY",
 }
 
 export { QUEUE_EVENT }

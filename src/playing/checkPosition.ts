@@ -1,8 +1,8 @@
 import { logger } from "../logger"
 
-const checkPosition = (p: any, place: any, color: any) => {
+const checkPosition = (p: any, place: any, color: any, isBot: boolean) => {
     try {
-        logger.info(`START checkPosition :::: Position : ${p} AND Place : ${place} And Color : ${color}`)
+        logger.info(`START checkPosition :::: Position : ${p} AND Place : ${place} And Color : ${color} And isBot : ${isBot}`)
         if (color == 'red') {
             console.log("This is Inside color red")
             const placeMapping: any = {

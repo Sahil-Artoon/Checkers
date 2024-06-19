@@ -1,4 +1,5 @@
 import { botPlay } from "../bot/botPlay"
+import { botPlayQueue } from "../bull/Queue/botPlayQueue"
 import { REDIS_EVENT_NAME } from "../constant/redisConstant"
 import { SOCKET_EVENT_NAME } from "../constant/socketEventName"
 import { sendToRoomEmmiter } from "../eventEmmitter"
@@ -36,9 +37,10 @@ const changeTurn = async (data: any, socket: any) => {
                             tableId,
                             userId: table.playerInfo[1].userId,
                             firstTurn: false,
-                            lastMove
+                            lastMove,
+                            timer: 2000
                         }
-                        botPlay(data, socket)
+                        botPlayQueue(data, socket)
                     }
                 }
                 if (findTable.currentTurnSeatIndex == 1) {
@@ -64,9 +66,10 @@ const changeTurn = async (data: any, socket: any) => {
                             tableId,
                             userId: table.playerInfo[1].userId,
                             firstTurn: false,
-                            lastMove
+                            lastMove,
+                            timer: 2000
                         }
-                        botPlay(data, socket)
+                        botPlayQueue(data, socket)
                     }
                 }
             }
