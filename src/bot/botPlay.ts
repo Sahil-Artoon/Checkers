@@ -3,7 +3,7 @@ import { logger } from "../logger"
 import { move } from "../playing/move"
 import { playGame } from "../playing/play"
 import { redisGet } from "../redisOption"
-import { checkBestPosition, checkBotPosition } from "./checkBotPosition"
+import { checkBestPosition, checkBestPositionIsValidOrNot, checkBotPosition } from "./checkBotPosition"
 
 const botPlay = async (data: any, socket: any) => {
     try {
@@ -43,6 +43,8 @@ const botPlay = async (data: any, socket: any) => {
                     if (checkPosition) {
                         let bestPosition = await checkBestPosition(findTable.tableData, checkPosition)
                         console.log("::::::::::::: This is BestPosition AT botPlay ::::::::::::: ", bestPosition)
+
+                        // This is for bestPosition length 1;
                         if (bestPosition.length == 1) {
                             data = {
                                 userId: findUser._id,
@@ -66,54 +68,37 @@ const botPlay = async (data: any, socket: any) => {
                                 move(data, socket)
                             }
                         } else {
+                            // This is for Best Position length more then 1;
                             let result: any = null;
+                            let arrOfSafePositon: any = [];
                             for (let i = 0; i < bestPosition.length; i++) {
-                                if (bestPosition[i].check != 0) {
-                                    data = {
-                                        userId: findUser._id,
-                                        userName: findUser.userName,
-                                        isBot: findUser.isBot,
-                                        tableId: findTable._id,
-                                        position: `D-${bestPosition[i].position}`
-                                    }
-                                    result = await playGame(data, socket)
-                                    console.log(":::::::::::::::::::::::::::::::::::::::::::::")
-                                    console.log(" ::::::::: This is Results ::::::::: ", result)
-                                    console.log(":::::::::::::::::::::::::::::::::::::::::::::")
-                                    if (result.sendPosition.length != 0) {
-                                        let data = {
-                                            userId: result.userId,
-                                            tableId: result.tableId,
-                                            movePosition: `D-${result.sendPosition[0].push}`,
-                                            movePiece: result.position,
-                                            dataOfPlay: result.sendPosition
-                                        }
-                                        return move(data, socket)
-                                    }
+                                let checkBestPositionIsValid: any = await checkBestPositionIsValidOrNot(findTable.tableData, bestPosition[i])
+                                console.log(`This is checkBestPositionIsValid[${i}] :::: ${JSON.stringify(checkBestPositionIsValid)}`)
+                                if (checkBestPositionIsValid.length > 0) {
+                                    arrOfSafePositon.push(checkBestPositionIsValid)
                                 }
                             }
-                            if (result == null) {
-                                data = {
-                                    userId: findUser._id,
-                                    userName: findUser.userName,
-                                    isBot: findUser.isBot,
-                                    tableId: findTable._id,
-                                    position: `D-${bestPosition[0].position}`
+                            console.log("arrOfSafePositon :::: ", arrOfSafePositon)
+                            data = {
+                                userId: findUser._id,
+                                userName: findUser.userName,
+                                isBot: findUser.isBot,
+                                tableId: findTable._id,
+                                position: `D-${bestPosition[0].position}`
+                            }
+                            result = await playGame(data, socket)
+                            console.log(":::::::::::::::::::::::::::::::::::::::::::::")
+                            console.log(" ::::::::: This is Results ::::::::: ", result)
+                            console.log(":::::::::::::::::::::::::::::::::::::::::::::")
+                            if (result.sendPosition.length != 0) {
+                                let data = {
+                                    userId: result.userId,
+                                    tableId: result.tableId,
+                                    movePosition: `D-${result.sendPosition[0].push}`,
+                                    movePiece: result.position,
+                                    dataOfPlay: result.sendPosition
                                 }
-                                result = await playGame(data, socket)
-                                console.log(":::::::::::::::::::::::::::::::::::::::::::::")
-                                console.log(" ::::::::: This is Results ::::::::: ", result)
-                                console.log(":::::::::::::::::::::::::::::::::::::::::::::")
-                                if (result.sendPosition.length != 0) {
-                                    let data = {
-                                        userId: result.userId,
-                                        tableId: result.tableId,
-                                        movePosition: `D-${result.sendPosition[0].push}`,
-                                        movePiece: result.position,
-                                        dataOfPlay: result.sendPosition
-                                    }
-                                    return move(data, socket)
-                                }
+                                return move(data, socket)
                             }
                         }
                     }

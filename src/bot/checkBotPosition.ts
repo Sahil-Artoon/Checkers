@@ -129,4 +129,60 @@ const checkBestPosition = async (place: any, positions: any) => {
     }
 }
 
-export { checkBotPosition, checkBestPosition }
+const checkBestPositionIsValidOrNot = async (tableData: any, position: any) => {
+    try {
+        logger.info(`START checkBestPositionIsValidOrNot :::: DATA :::: ${JSON.stringify(tableData)} AND POSITION :::: ${JSON.stringify(position)}`)
+        let checkKill: any = {
+            10: [{ check: 19, move: 1 }],
+            12: [{ check: 19, move: 5 }, { check: 21, move: 3 }],
+            14: [{ check: 21, move: 7 }, { check: 23, move: 5 }],
+            19: [{ check: 26, move: 12 }, { check: 28, move: 10 }],
+            21: [{ check: 28, move: 14 }, { check: 30, move: 12 }],
+            23: [{ check: 30, move: 16 }, { check: 32, move: 14 }],
+            26: [{ check: 33, move: 19 }, { check: 35, move: 17 }],
+            28: [{ check: 35, move: 21 }, { check: 37, move: 19 }],
+            30: [{ check: 37, move: 23 }, { check: 39, move: 21 }],
+            35: [{ check: 42, move: 28 }, { check: 44, move: 26 }],
+            37: [{ check: 44, move: 30 }, { check: 46, move: 28 }],
+            39: [{ check: 46, move: 32 }, { check: 48, move: 30 }],
+            42: [{ check: 49, move: 35 }, { check: 51, move: 33 }],
+            44: [{ check: 51, move: 37 }, { check: 53, move: 35 }],
+
+            46: [{ check: 53, move: 39 }, { check: 55, move: 37 }],
+            51: [{ check: 58, move: 44 }, { check: 60, move: 42 }],
+            53: [{ check: 60, move: 46 }, { check: 62, move: 44 }],
+            55: [{ check: 62, move: 48 }, { check: 64, move: 46 }],
+        }
+        let arr: any = [];
+        if (checkKill[position.push]) {
+            checkKill[position.push].forEach((item: any) => {
+                if (tableData[item.check - 1]?.pieceId?.split("-")[0] != "R" || tableData[item.check - 1]?.pieceId == null) {
+                    if (tableData[item.move - 1].pieceId == null) {
+                        let data = {
+                            position: position.position,
+                            check: position.check,
+                            move: position.push
+                        }
+                        console.log("This is inSide of checkBestPositionIsValidOrNot ", data)
+                        arr.push(data)
+                    }
+                }
+                // } else {
+                //     let data = {
+                //         position: position.position,
+                //         check: position.check,
+                //         move: position.push
+                //     }
+                //     console.log("This is inSide of checkBestPositionIsValidOrNot ", data)
+                //     arr.push(data)
+                // }
+            });
+        }
+        return arr
+    } catch (error) {
+        logger.error(`CATCH_ERROR checkBestPositionIsValidOrNot :::: ${error}`)
+    }
+}
+
+
+export { checkBotPosition, checkBestPosition, checkBestPositionIsValidOrNot }
