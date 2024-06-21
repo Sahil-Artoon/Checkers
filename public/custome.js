@@ -525,20 +525,38 @@ const reJoin = (data) => {
                 if (tableData[i].pieceId) {
                     if (tableData[i].pieceId != null) {
                         if (tableData[i].pieceId.split('-')[0] == "R") {
-                            let img = document.createElement('img')
-                            img.src = 'image/red.png';
-                            img.alt = 'red-piece';
-                            img.className = 'piece red-piece';
-                            img.id = tableData[i].pieceId;
-                            ele[i].appendChild(img);
+                            if (tableData[i].pieceId.split('-')[1] == "king") {
+                                let img = document.createElement('img')
+                                img.src = 'image/red_king.png';
+                                img.alt = 'red-piece';
+                                img.className = 'piece red-piece';
+                                img.id = tableData[i].pieceId;
+                                ele[i].appendChild(img);
+                            } else {
+                                let img = document.createElement('img')
+                                img.src = 'image/red.png';
+                                img.alt = 'red-piece';
+                                img.className = 'piece red-piece';
+                                img.id = tableData[i].pieceId;
+                                ele[i].appendChild(img);
+                            }
                         }
                         if (tableData[i].pieceId.split('-')[0] == "B") {
-                            let img = document.createElement('img')
-                            img.src = 'image/black.png';
-                            img.alt = 'black-piece';
-                            img.className = 'piece black-piece';
-                            img.id = tableData[i].pieceId;
-                            ele[i].appendChild(img);
+                            if (tableData[i].pieceId.split('-')[1] == "king") {
+                                let img = document.createElement('img')
+                                img.src = 'image/black_king.png';
+                                img.alt = 'black-piece';
+                                img.className = 'piece black-piece';
+                                img.id = tableData[i].pieceId;
+                                ele[i].appendChild(img);
+                            } else {
+                                let img = document.createElement('img')
+                                img.src = 'image/black.png';
+                                img.alt = 'black-piece';
+                                img.className = 'piece black-piece';
+                                img.id = tableData[i].pieceId;
+                                ele[i].appendChild(img);
+                            }
                         }
                     }
                 }
