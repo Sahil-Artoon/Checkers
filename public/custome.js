@@ -311,6 +311,10 @@ const move = (data) => {
         console.log("DATA OF removePiece PIECE :::: ", data.removePiece)
         console.log("DATA OF emptyBoxId PIECE :::: ", data.emptyBoxId)
         console.log("DATA OF REMOVE addBoxId :::: ", data.addBoxId)
+        console.log("DATA OF blackTotalKill :::: ", data.blackTotalKill)
+        console.log("DATA OF redTotalKill :::: ", data.redTotalKill)
+        document.getElementById('redTotalKill').innerHTML = `${data.redTotalKill}`
+        document.getElementById('blackTotalKill').innerHTML = `${data.blackTotalKill}`
         if (data.removePiece) {
             let findEle = document.getElementById(`D-${data.removePiece}`)
             if (findEle == null) {

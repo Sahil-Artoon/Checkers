@@ -95,7 +95,9 @@ const move = async (data: any, socket: any) => {
                             emptyBoxId: movePiece,
                             addBoxId: movePosition,
                             message: "ok",
-                            removePiece
+                            removePiece,
+                            redTotalKill:findTable.redTotalLose,
+                            blackTotalKill:findTable.blackTotalLose
                         }
                     }
                     sendToRoomEmmiter(data)

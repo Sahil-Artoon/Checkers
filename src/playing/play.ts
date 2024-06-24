@@ -60,14 +60,16 @@ const playGame = async (data: any, socket: any) => {
             let color;
             let parts = position.split("-");
             let numberOfBox = parts[1];
-            let checkKingColor = parts[0]
-            if (checkKingColor == 'redKing') {
-                color = 'redKing'
+
+            if (findTable.tableData[numberOfBox - 1].pieceId.split('-')[0] == "R" && findTable.tableData[numberOfBox - 1].pieceId.split('-')[1] != "king") {
+                color = 'red'
+            } else if (findTable.tableData[numberOfBox - 1].pieceId.split('-')[0] == "B" && findTable.tableData[numberOfBox - 1].pieceId.split('-')[0] != "king") {
+                color = "black"
+            } else if (findTable.tableData[numberOfBox - 1].pieceId.split('-')[0] == "R" && findTable.tableData[numberOfBox - 1].pieceId.split('-')[1] == "king") {
+                color = "redKing"
             }
-            else if (checkKingColor == 'blackKing') {
-                color = 'blackKing'
-            } else {
-                color = findTable.playerInfo[findTable.currentTurnSeatIndex].color
+            else if (findTable.tableData[numberOfBox - 1].pieceId.split('-')[0] == "B" && findTable.tableData[numberOfBox - 1].pieceId.split('-')[1] == "king") {
+                color = "blackKing"
             }
             console.log("This is NumberOfBox :::", numberOfBox)
             let place = findTable.tableData
