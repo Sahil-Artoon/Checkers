@@ -328,6 +328,7 @@ const move = (data) => {
             findEle.removeAttribute('id')
             findEle.id = `D-${data.removePiece}`
         }
+
         let part = data.emptyBoxId.split("-")
         let checkColor = part[0]
         let numberOfBoxes = part[1]
@@ -358,6 +359,10 @@ const move = (data) => {
             addEle.id = `redKing-${addBoxId}`
             addEle.appendChild(img)
         } else {
+            let eleOfimg = document.getElementById(`${data.emptyBoxId}`)
+            console.log("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::")
+            console.log("This is element in else condition ", eleOfimg)
+            console.log("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::")
             let img = document.getElementById(`${data.emptyBoxId}`).querySelector(`img`)
             document.getElementById(`${data.emptyBoxId}`).removeChild(img)
             document.getElementById(`${data.addBoxId}`).appendChild(img)
@@ -389,8 +394,11 @@ const winner = (data) => {
         document.getElementById('section-4').style.display = "block"
         if (data.userId == userId) {
             document.getElementById('time').innerHTML = `You Win ${userName}`
-        } else {
+        } else if (data.userId != userId) {
             document.getElementById('time').innerHTML = `You Lose ${userName}`
+        }
+        if (data.tie) {
+            document.getElementById('time').innerHTML = "IT'S TIE"
         }
     }
 }
@@ -523,6 +531,8 @@ const reJoin = (data) => {
         // This is for PLAYING
         if (data.gameStatus == "PLAYING") {
             console.log("THis is inside rejoin LOCK_TABLE")
+            document.getElementById('redTotalKill').innerHTML = `${data.table.redTotalLose}`
+            document.getElementById('blackTotalKill').innerHTML = `${data.table.blackTotalLose}`
             let tableData = data.table.tableData
             let ele = document.getElementsByClassName("cell")
             for (let i = 0; i < tableData.length; i++) {
@@ -590,7 +600,7 @@ const reJoin = (data) => {
         }
 
         // This is for WINNER
-        if (data.gameStatus == "WINNER") {
+        if (data.gameStatus == "WINNER" || data.gameStatus == "TIE") {
             console.log("THis is inside rejoin WINNER")
             let tableData = data.table.tableData
             let ele = document.getElementsByClassName("cell")
@@ -626,10 +636,15 @@ const reJoin = (data) => {
                 document.getElementById('section-3').style.display = "block"
                 document.getElementById('section-4').style.display = "block"
                 document.getElementById('time').innerHTML = `You Win ${userName}`
-                if (data.table.winnerUserId == userId) {
-                    document.getElementById('time').innerHTML = `You Win ${userName}`
-                } else {
-                    document.getElementById('time').innerHTML = `You Lose ${userName}`
+                if (data.tie == true) {
+                    document.getElementById('time').innerHTML = "IT'S TIE"
+                }
+                else {
+                    if (data.table.winnerUserId == userId) {
+                        document.getElementById('time').innerHTML = `You Win ${userName}`
+                    } else {
+                        document.getElementById('time').innerHTML = `You Lose ${userName}`
+                    }
                 }
             }
             if (data.table.playerInfo[1].userId == data.userId) {
@@ -644,10 +659,15 @@ const reJoin = (data) => {
                 document.getElementById('leaveButton').style.transform = "rotate(180deg)"
                 document.getElementById('section-4').style.display = "block"
                 document.getElementById('time').innerHTML = `You Win ${userName}`
-                if (data.table.winnerUserId == userId) {
-                    document.getElementById('time').innerHTML = `You Win ${userName}`
-                } else {
-                    document.getElementById('time').innerHTML = `You Lose ${userName}`
+                if (data.tie == true) {
+                    document.getElementById('time').innerHTML = "IT'S TIE"
+                }
+                else {
+                    if (data.table.winnerUserId == userId) {
+                        document.getElementById('time').innerHTML = `You Win ${userName}`
+                    } else {
+                        document.getElementById('time').innerHTML = `You Lose ${userName}`
+                    }
                 }
             }
         }

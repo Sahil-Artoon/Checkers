@@ -58,12 +58,11 @@ const playGame = async (data: any, socket: any) => {
         }
         if (findTable.currentTurnUserId == userId) {
             let color;
-            let parts = position.split("-");
-            let numberOfBox = parts[1];
+            let numberOfBox = position.split("-")[1];
 
             if (findTable.tableData[numberOfBox - 1].pieceId.split('-')[0] == "R" && findTable.tableData[numberOfBox - 1].pieceId.split('-')[1] != "king") {
                 color = 'red'
-            } else if (findTable.tableData[numberOfBox - 1].pieceId.split('-')[0] == "B" && findTable.tableData[numberOfBox - 1].pieceId.split('-')[0] != "king") {
+            } else if (findTable.tableData[numberOfBox - 1].pieceId.split('-')[0] == "B" && findTable.tableData[numberOfBox - 1].pieceId.split('-')[1] != "king") {
                 color = "black"
             } else if (findTable.tableData[numberOfBox - 1].pieceId.split('-')[0] == "R" && findTable.tableData[numberOfBox - 1].pieceId.split('-')[1] == "king") {
                 color = "redKing"
@@ -74,7 +73,7 @@ const playGame = async (data: any, socket: any) => {
             console.log("This is NumberOfBox :::", numberOfBox)
             let place = findTable.tableData
             if (isBot == false) {
-                let sendPosition: any = await checkPosition(numberOfBox, place, color, isBot)
+                let sendPosition: any = await checkPosition(numberOfBox, place, color)
                 console.log("This is SendPosition :::", sendPosition)
                 if (sendPosition) {
                     data = {
@@ -96,7 +95,7 @@ const playGame = async (data: any, socket: any) => {
                 }
             }
             if (isBot == true) {
-                let sendPosition: any = await checkPosition(numberOfBox, place, color, isBot)
+                let sendPosition: any = await checkPosition(numberOfBox, place, color)
                 console.log("This is SendPosition :::", sendPosition)
                 if (sendPosition) {
                     data = {

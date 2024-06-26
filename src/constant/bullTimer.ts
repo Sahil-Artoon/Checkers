@@ -2,6 +2,6 @@ const BULL_TIMER = {
     JOIN_BOT_TIMER: 2000,
     ROUND_TIMER: 3000,
     LOCK_TABLE: 2000,
-    RE_START: 15000,
+    RE_START: 5000,
 }
 export { BULL_TIMER }

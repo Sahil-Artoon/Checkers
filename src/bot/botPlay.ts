@@ -1,8 +1,13 @@
+import { reStartQueue } from "../bull/Queue/reStartQueue"
+import { BULL_TIMER } from "../constant/bullTimer"
+import { GAME_STATUS } from "../constant/gameStatus"
 import { REDIS_EVENT_NAME } from "../constant/redisConstant"
+import { SOCKET_EVENT_NAME } from "../constant/socketEventName"
+import { sendToRoomEmmiter } from "../eventEmmitter"
 import { logger } from "../logger"
 import { move } from "../playing/move"
 import { playGame } from "../playing/play"
-import { redisGet } from "../redisOption"
+import { redisDel, redisGet, redisSet } from "../redisOption"
 import { checkBestPosition, checkPosition, checkvalidPosition } from "./checkBotPosition"
 
 const botPlay = async (data: any, socket: any) => {
@@ -44,14 +49,33 @@ const botPlay = async (data: any, socket: any) => {
                         let arrOfposition = [];
                         for (let i = 0; i < position.length; i++) {
                             let dataOfBestPosition: any = await checkBestPosition(findTable.tableData, position[i])
-                            if (dataOfBestPosition.length > 0) {
+                            if (dataOfBestPosition) {
                                 arrOfposition.push(dataOfBestPosition)
                             }
                         }
                         console.log(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ")
                         console.log(" ====== This is DataOfBestPosition ======", arrOfposition)
                         console.log(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ")
-
+                        if (arrOfposition.length == 0) {
+                            findTable.gameStatus = GAME_STATUS.TIE
+                            findTable.winnerUserId = ''
+                            await redisDel(`${REDIS_EVENT_NAME.TABLE}:${findTable._id}`)
+                            await redisSet(`${REDIS_EVENT_NAME.TABLE}:${findTable._id}`, findTable)
+                            data = {
+                                eventName: SOCKET_EVENT_NAME.WINNER,
+                                data: {
+                                    _id: findTable._id,
+                                    message: "ok",
+                                    tie: true
+                                }
+                            }
+                            sendToRoomEmmiter(data)
+                            data = {
+                                tableId: findTable._id,
+                                timer: BULL_TIMER.RE_START
+                            }
+                            reStartQueue(data, socket)
+                        }
                         if (arrOfposition) {
                             let arrOfBestPosition: any = []
                             for (let i = 0; i < arrOfposition.length; i++) {
@@ -87,22 +111,53 @@ const botPlay = async (data: any, socket: any) => {
                             let checkKill = await arrOfBestPosition.findIndex((item: any) => item.check !== 0);
                             if (checkKill != -1) {
                                 console.log("Kill True inside CheckKill ::::", checkKill)
+                                let movePiece;
+                                if (
+                                    findTable.tableData[arrOfBestPosition[checkKill].position - 1].pieceId.split('-')[0] == "R" ||
+                                    findTable.tableData[arrOfBestPosition[checkKill].position - 1].pieceId.split('-')[0] == "B"
+                                ) {
+                                    movePiece = `D-${arrOfBestPosition[checkKill].position}`
+                                } else if (findTable.tableData[arrOfBestPosition[checkKill].position - 1].pieceId == "R-king") {
+                                    movePiece = `redKing-${arrOfBestPosition[checkKill].position}`
+                                } else if (findTable.tableData[arrOfBestPosition[checkKill].position - 1].pieceId == "B-king") {
+                                    movePiece = `blackKing-${arrOfBestPosition[checkKill].position}`
+                                }
                                 let data = {
                                     userId: userId,
                                     tableId: tableId,
                                     movePosition: `D-${arrOfBestPosition[checkKill].push}`,
-                                    movePiece: `D-${arrOfBestPosition[checkKill].position}`,
+                                    movePiece,
                                     dataOfPlay: [arrOfBestPosition[checkKill]]
                                 }
                                 move(data, socket)
                             } else {
                                 console.log("Kill false inside CheckKill ::::", checkKill)
+                                let randomNumber = Math.floor(Math.random() * arrOfBestPosition.length)
+                                let movePiece;
+                                if (
+                                    (findTable.tableData[arrOfBestPosition[randomNumber].position - 1].pieceId.split('-')[0] == "R" &&
+                                        findTable.tableData[arrOfBestPosition[randomNumber].position - 1].pieceId.split('-')[1] != "king") ||
+                                    (findTable.tableData[arrOfBestPosition[randomNumber].position - 1].pieceId.split('-')[0] == "B" &&
+                                        findTable.tableData[arrOfBestPosition[randomNumber].position - 1].pieceId.split('-')[1] != "king")
+                                ) {
+                                    console.log("move Piece inSide of R and B");
+                                    movePiece = `D-${arrOfBestPosition[randomNumber].position}`
+                                } else if (findTable.tableData[arrOfBestPosition[randomNumber].position - 1].pieceId == "R-king") {
+                                    movePiece = `redKing-${arrOfBestPosition[randomNumber].position}`
+                                    console.log("move Piece inSide of R-King");
+                                } else if (findTable.tableData[arrOfBestPosition[randomNumber].position - 1].pieceId == "B-king") {
+                                    movePiece = `blackKing-${arrOfBestPosition[randomNumber].position}`
+                                    console.log("move Piece inSide of B-King");
+                                }
+                                console.log("RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR")
+                                console.log("This is movePiece :::: ", movePiece)
+                                console.log("RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR")
                                 let data = {
                                     userId: userId,
                                     tableId: tableId,
-                                    movePosition: `D-${arrOfBestPosition[0].push}`,
-                                    movePiece: `D-${arrOfBestPosition[0].position}`,
-                                    dataOfPlay: [arrOfBestPosition[0]]
+                                    movePosition: `D-${arrOfBestPosition[randomNumber].push}`,
+                                    movePiece,
+                                    dataOfPlay: [arrOfBestPosition[randomNumber]]
                                 }
                                 move(data, socket)
                             }

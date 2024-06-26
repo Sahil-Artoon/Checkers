@@ -1,8 +1,8 @@
 import { logger } from "../logger"
 
-const checkPosition = (p: any, place: any, color: any, isBot: boolean) => {
+const checkPosition = (p: any, place: any, color: any) => {
     try {
-        logger.info(`START checkPosition :::: Position : ${p} AND Place : ${place} And Color : ${color} And isBot : ${isBot}`)
+        logger.info(`START checkPosition :::: Position : ${p} AND Place : ${place} And Color : ${color}.`)
         if (color == 'red') {
             console.log("This is Inside color red")
             const placeMapping: any = {
@@ -309,7 +309,9 @@ const checkPosition = (p: any, place: any, color: any, isBot: boolean) => {
             }
             if (placeMapping[p]) {
                 placeMapping[p].forEach((index: any) => {
-                    if (!place[index - 1].pieceId) {
+                    console.log("This is index ::::: ", index)
+                    if (place[index - 1].pieceId == null) {
+                        console.log("inside Of index-1")
                         let data = {
                             check: 0,
                             push: index

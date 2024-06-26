@@ -136,8 +136,25 @@ const reJoin = async (data: any, socket: any) => {
                 return;
             }
 
-            if (findTable.gameStatus == GAME_STATUS.WINNER) {
-                console.log("This is Inside GameStatus ::::: WINNER")
+
+            if (findTable.gameStatus == GAME_STATUS.TIE) {
+                data = {
+                    eventName: SOCKET_EVENT_NAME.RE_JOIN,
+                    data: {
+                        gameStatus: GAME_STATUS.TIE,
+                        message: "ok",
+                        tableId,
+                        userId,
+                        table: findTable,
+                        tie: true
+                    },
+                    socket
+                }
+                socket.join(findTable._id)
+                sendToSocketIdEmmiter(data)
+                logger.info(`END reJoin :::: ${JSON.stringify(data.data)}`)
+                return;
+            } else if (findTable.gameStatus == GAME_STATUS.WINNER) {
                 data = {
                     eventName: SOCKET_EVENT_NAME.RE_JOIN,
                     data: {
@@ -154,7 +171,6 @@ const reJoin = async (data: any, socket: any) => {
                 logger.info(`END reJoin :::: ${JSON.stringify(data.data)}`)
                 return;
             }
-
         }
     } catch (error) {
         logger.error(`CATCH_ERROR reJoin :::: ${error}`)

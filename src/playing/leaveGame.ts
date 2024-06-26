@@ -176,6 +176,8 @@ const leaveGame = async (data: any, socket: any) => {
 
             if (findTable.gameStatus == GAME_STATUS.PLAYING) {
                 findTable.gameStatus = GAME_STATUS.WINNER
+                findUser.tableId = ""
+                await redisSet(`${REDIS_EVENT_NAME.USER}:${userId}`, findUser) 
                 if (findTable.playerInfo[0].userId == userId) {
                     findTable.winnerUserId = findTable.playerInfo[1].userId
                     await redisDel(`${REDIS_EVENT_NAME.TABLE}:${findTable._id}`)

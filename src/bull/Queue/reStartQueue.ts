@@ -28,17 +28,29 @@ const reStartQueue = async (data: any, socket: any) => {
                 let userOne: any = await redisGet(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[0].userId}`)
                 userOne = JSON.parse(userOne)
                 if (userOne) {
-                    userOne.tableId = ""
+                    if (userOne.isBot == true) {
+                        await redisDel(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[0].userId}`)
+                    } else {
+                        if (findTable._id == userOne.tableId) {
+                            userOne.tableId = ""
+                            await redisDel(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[0].userId}`)
+                            await redisSet(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[0].userId}`, userOne)
+                        }
+                    }
                 }
-                await redisDel(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[0].userId}`)
-                await redisSet(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[0].userId}`, userOne)
                 let userTwo: any = await redisGet(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[1].userId}`)
                 userTwo = JSON.parse(userTwo)
                 if (userTwo) {
-                    userTwo.tableId = ""
+                    if (userTwo.isBot == true) {
+                        await redisDel(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[1].userId}`)
+                    } else {
+                        if (findTable._id == userTwo.tableId) {
+                            userOne.tableId = ""
+                            await redisDel(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[1].userId}`)
+                            await redisSet(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[1].userId}`, userTwo)
+                        }
+                    }
                 }
-                await redisDel(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[1].userId}`)
-                await redisSet(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[1].userId}`, userTwo)
             }
             data = {
                 eventName: SOCKET_EVENT_NAME.RE_START,

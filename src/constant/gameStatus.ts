@@ -5,5 +5,6 @@ const GAME_STATUS = {
     PLAYING: "PLAYING",
     WINNER: "WINNER",
     LOCK_TABLE: "LOCK_TABLE",
+    TIE: "TIE",
 }
 export { GAME_STATUS }
