@@ -194,7 +194,7 @@ const joinTable = (data) => {
         for (let i = 0; i < tableData.length; i++) {
             if (tableData[i].pieceId) {
                 if (tableData[i].pieceId != null) {
-                    if (tableData[i].pieceId.split('-')[0] == "R") {
+                    if (tableData[i].pieceId.split('-')[0] == "R" && tableData[i].pieceId.split('-')[1] != "king") {
                         let img = document.createElement('img')
                         img.src = 'image/red.png';
                         img.alt = 'red-piece';
@@ -202,9 +202,25 @@ const joinTable = (data) => {
                         img.id = tableData[i].pieceId;
                         ele[i].appendChild(img);
                     }
-                    if (tableData[i].pieceId.split('-')[0] == "B") {
+                    if (tableData[i].pieceId.split('-')[0] == "B" && tableData[i].pieceId.split('-')[1] != "king") {
                         let img = document.createElement('img')
                         img.src = 'image/black.png';
+                        img.alt = 'black-piece';
+                        img.className = 'piece black-piece';
+                        img.id = tableData[i].pieceId;
+                        ele[i].appendChild(img);
+                    }
+                    if (tableData[i].pieceId == "B-king") {
+                        let img = document.createElement('img')
+                        img.src = 'image/black_king.png';
+                        img.alt = 'black-piece';
+                        img.className = 'piece black-piece';
+                        img.id = tableData[i].pieceId;
+                        ele[i].appendChild(img);
+                    }
+                    if (tableData[i].pieceId == "R-king") {
+                        let img = document.createElement('img')
+                        img.src = 'image/red_king.png';
                         img.alt = 'black-piece';
                         img.className = 'piece black-piece';
                         img.id = tableData[i].pieceId;
@@ -329,44 +345,33 @@ const move = (data) => {
             findEle.id = `D-${data.removePiece}`
         }
 
-        let part = data.emptyBoxId.split("-")
-        let checkColor = part[0]
-        let numberOfBoxes = part[1]
+
+        let checkColor;
+        let numberOfBoxes = data.emptyBoxId.split("-")[1]
         let addBoxId = data.addBoxId.split("-")[1]
-        console.log(":::: This is Check Color in MOVE :::: ", checkColor)
-        if (checkColor == "blackKing") {
-            let ele = document.getElementById(data.emptyBoxId)
-            let img = ele.querySelector("img")
-            ele.removeChild(img)
-            ele.removeAttribute("id")
-            ele.id = `D-${numberOfBoxes}`
-            let addEle = document.getElementById(data.addBoxId)
-            console.log("This is move addEle checkColor = blackKing", addEle)
-            console.log("This is move IMG checkColor = blackKing", img)
-            addEle.removeAttribute("id")
-            addEle.id = `blackKing-${addBoxId}`
-            addEle.appendChild(img)
-        } else if (checkColor == 'redKing') {
-            let ele = document.getElementById(data.emptyBoxId)
-            let img = ele.querySelector("img")
-            ele.removeChild(img)
-            ele.removeAttribute("id")
-            ele.id = `D-${numberOfBoxes}`
-            let addEle = document.getElementById(data.addBoxId)
-            console.log("This is move addEle checkColor = blackKing", addEle)
-            console.log("This is move IMG checkColor = blackKing", img)
-            addEle.removeAttribute("id")
-            addEle.id = `redKing-${addBoxId}`
-            addEle.appendChild(img)
-        } else {
-            let eleOfimg = document.getElementById(`${data.emptyBoxId}`)
-            console.log("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::")
-            console.log("This is element in else condition ", eleOfimg)
-            console.log("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::")
-            let img = document.getElementById(`${data.emptyBoxId}`).querySelector(`img`)
-            document.getElementById(`${data.emptyBoxId}`).removeChild(img)
-            document.getElementById(`${data.addBoxId}`).appendChild(img)
+        let ELE = document.getElementById(`D-${numberOfBoxes}`)
+        if (ELE == null) {
+            ELE = document.getElementById(`redKing-${numberOfBoxes}`)
+            if (ELE == null) {
+                ELE = document.getElementById(`blackKing-${numberOfBoxes}`)
+            }
         }
+        console.log("This is ELE ::::: ", ELE)
+        console.log("This is ELE Id :::: ", ELE.id)
+
+        checkColor = ELE.id.split("-")[0]
+        console.log("This is checkColor :::: ", checkColor)
+        let imgOfEmptyBox = ELE.querySelector("img")
+        console.log("This is imgOf EmptyBox :::: ", imgOfEmptyBox)
+
+        let ELEOfAddBox = document.getElementById(`D-${addBoxId}`)
+        ELEOfAddBox.removeAttribute("id")
+        ELEOfAddBox.id = `${checkColor}-${addBoxId}`
+        ELEOfAddBox.appendChild(imgOfEmptyBox)
+
+        ELE.removeAttribute("id")
+        ELE.id = `D-${numberOfBoxes}`
+        
     }
 }
 
