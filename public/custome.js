@@ -285,23 +285,77 @@ const lockTable = (data) => {
 
 const turn = (data) => {
     console.log(`turn :::: DATA :::: ${JSON.stringify(data)}`)
+    document.getElementById('section-4').style.display = 'none'
+     document.getElementById('leaveButton').style.display = 'block'
     let User = getSession('USER');
     console.log("User", User)
     console.log("UserId", data.userId)
-    document.getElementById('leaveButton').style.display = 'block'
-    if (User._id == data.userId) {
-        document.getElementById('section-4').style.display = 'none'
-        // document.getElementById('section-5').style.display = 'block'
-        // document.getElementById('section-6').style.display = 'block'
+    let curretUser = getSession("USER_TABLE")
+    console.log("curretUser", curretUser)
+    if (curretUser.color == data.color) {
+        if (data.color == "red") {
+            let ele = document.getElementsByClassName('red-piece')
+            for (let i = 0; i < ele.length; i++) {
+                ele[i].classList.add('currentTurnAnimation')
+            }
+        }
+        if (data.color == "black") {
+            let ele = document.getElementsByClassName('black-piece')
+            for (let i = 0; i < ele.length; i++) {
+                ele[i].classList.add('currentTurnAnimation')
+            }
+        }
     } else {
-        document.getElementById('section-4').style.display = 'none'
-        // document.getElementById('section-5').style.display = 'block'
-        // document.getElementById('section-6').style.display = 'block'
+        if (data.color == "red") {
+            let ele = document.getElementsByClassName('red-piece')
+            for (let i = 0; i < ele.length; i++) {
+                ele[i].classList.remove('currentTurnAnimation')
+            }
+        }
+        if (data.color == "black") {
+            let ele = document.getElementsByClassName('black-piece')
+            for (let i = 0; i < ele.length; i++) {
+                ele[i].classList.remove('currentTurnAnimation')
+            }
+        }
     }
 }
 
 const changeTurn = (data) => {
     console.log(`changeTurn :::: DATA :::: ${JSON.stringify(data)}`)
+    let User = getSession('USER');
+    console.log("User", User)
+    console.log("UserId", data.userId)
+    let curretUser = getSession("USER_TABLE")
+    console.log("curretUser", curretUser)
+    if (curretUser.color == data.color) {
+        if (data.color == "red") {
+            let ele = document.getElementsByClassName('red-piece')
+            for (let i = 0; i < ele.length; i++) {
+                ele[i].classList.add('currentTurnAnimation')
+            }
+        }
+        if (data.color == "black") {
+            let ele = document.getElementsByClassName('black-piece')
+            for (let i = 0; i < ele.length; i++) {
+                ele[i].classList.add('currentTurnAnimation')
+            }
+        }
+    }
+    if (curretUser.color != data.color) {
+        if (data.color == "red") {
+            let ele = document.getElementsByClassName('black-piece')
+            for (let i = 0; i < ele.length; i++) {
+                ele[i].classList.remove('currentTurnAnimation')
+            }
+        }
+        if (data.color == "black") {
+            let ele = document.getElementsByClassName('red-piece')
+            for (let i = 0; i < ele.length; i++) {
+                ele[i].classList.remove('currentTurnAnimation')
+            }
+        }
+    }
 }
 
 const printPlace = (data) => {
@@ -371,7 +425,7 @@ const move = (data) => {
 
         ELE.removeAttribute("id")
         ELE.id = `D-${numberOfBoxes}`
-        
+
     }
 }
 

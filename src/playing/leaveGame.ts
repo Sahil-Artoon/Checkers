@@ -1,4 +1,5 @@
 import { reStartQueue } from "../bull/Queue/reStartQueue"
+import { cancleBotTimer } from "../bull/cancleQueue/cancleBotTimerQueue"
 import { cancleLockTable } from "../bull/cancleQueue/cancleLockTable"
 import { cancleRoundTimer } from "../bull/cancleQueue/cancleRoundTimer"
 import { BULL_TIMER } from "../constant/bullTimer"
@@ -63,6 +64,26 @@ const leaveGame = async (data: any, socket: any) => {
         if (findTable.gameStatus != GAME_STATUS.LOCK_TABLE) {
 
             if (findTable.gameStatus == GAME_STATUS.WAITING) {
+                if (findTable.playWithBot == true) {
+                    let checkJob = await cancleBotTimer(findTable._id)
+                    if (checkJob) {
+                        findUser.tableId = ""
+                        await redisDel(`${REDIS_EVENT_NAME.USER}:${userId}`)
+                        await redisSet(`${REDIS_EVENT_NAME.USER}:${userId}`, findUser)
+                        await redisDel(`${REDIS_EVENT_NAME.TABLE}:${findTable._id}`)
+                        data = {
+                            eventName: SOCKET_EVENT_NAME.LEAVE_GAME,
+                            data: {
+                                gameStatus: GAME_STATUS.WAITING,
+                                userId,
+                                message: "ok"
+                            },
+                            socket
+                        }
+                        logger.info(`END leaveGame gameStatus :::: WAITING Data :::: ${JSON.stringify(data.data)}`)
+                        return sendToSocketIdEmmiter(data)
+                    }
+                }
                 await redisDel(`${REDIS_EVENT_NAME.TABLE}:${tableId}`)
                 findUser.tableId = ""
                 await redisSet(`${REDIS_EVENT_NAME.USER}:${userId}`, findUser)
@@ -92,6 +113,60 @@ const leaveGame = async (data: any, socket: any) => {
             }
 
             if (findTable.gameStatus === GAME_STATUS.ROUND_TIMER) {
+                if (findTable.playWithBot == true) {
+                    let checkLockTable = await cancleLockTable(tableId)
+                    if (!checkLockTable) {
+                        data = {
+                            eventName: SOCKET_EVENT_NAME.POP_UP,
+                            data: {
+                                message: `Can't cancle LockTableQueue`
+                            },
+                            socket
+                        }
+                        sendToSocketIdEmmiter(data)
+                        logger.info(`END joinTable :::: ${JSON.stringify(data.data)}`)
+                        return;
+                    }
+                    let userOne: any = await redisGet(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[0].userId}`)
+                    userOne = JSON.parse(userOne)
+                    if (userOne) {
+                        if (userOne.isBot == true) {
+                            await redisDel(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[0].userId}`)
+                        } else {
+                            if (findTable._id == userOne.tableId) {
+                                userOne.tableId = ""
+                                await redisDel(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[0].userId}`)
+                                await redisSet(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[0].userId}`, userOne)
+                            }
+                        }
+                    }
+                    let userTwo: any = await redisGet(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[1].userId}`)
+                    userTwo = JSON.parse(userTwo)
+                    if (userTwo) {
+                        if (userTwo.isBot == true) {
+                            await redisDel(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[1].userId}`)
+                        } else {
+                            if (findTable._id == userTwo.tableId) {
+                                userTwo.tableId = ""
+                                await redisDel(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[1].userId}`)
+                                await redisSet(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[1].userId}`, userTwo)
+                            }
+                        }
+                    }
+                    data = {
+                        eventName: SOCKET_EVENT_NAME.LEAVE_GAME,
+                        data: {
+                            _id: tableId,
+                            gameStatus: GAME_STATUS.ROUND_TIMER,
+                            userId,
+                            message: "ok"
+                        },
+                        socket
+                    }
+                    sendToRoomEmmiter(data)
+                    logger.info(`END leaveGame gameStatus :::: ROUND_TIMER Data :::: ${JSON.stringify(data.data)}`)
+                    return;
+                }
                 if (findTable.playerInfo[0].userId == userId) {
                     findTable.playerInfo.pop()
                     console.log(findTable.playerInfo)
@@ -177,7 +252,7 @@ const leaveGame = async (data: any, socket: any) => {
             if (findTable.gameStatus == GAME_STATUS.PLAYING) {
                 findTable.gameStatus = GAME_STATUS.WINNER
                 findUser.tableId = ""
-                await redisSet(`${REDIS_EVENT_NAME.USER}:${userId}`, findUser) 
+                await redisSet(`${REDIS_EVENT_NAME.USER}:${userId}`, findUser)
                 if (findTable.playerInfo[0].userId == userId) {
                     findTable.winnerUserId = findTable.playerInfo[1].userId
                     await redisDel(`${REDIS_EVENT_NAME.TABLE}:${findTable._id}`)

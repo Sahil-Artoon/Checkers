@@ -278,3 +278,17 @@ input[type="submit"]:hover {
     background-color: red;
     font-size: medium;
 }
+
+@keyframes boxShadowAnimation {
+    0% {
+        box-shadow: 0 10px 20px #000;
+    }
+
+    100% {
+        box-shadow: 0 10px 30px #000;
+    }
+}
+
+.currentTurnAnimation {
+    animation: boxShadowAnimation 1s infinite alternate;
+}
