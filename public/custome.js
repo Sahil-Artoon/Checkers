@@ -261,7 +261,7 @@ const joinTable = (data) => {
             document.getElementById('section-2').style.display = "none"
             document.getElementById('section-3').style.display = "block"
             document.getElementById('main-board').style.transform = "rotate(180deg)"
-            document.getElementById('leaveButton').style.transform = "rotate(180deg)"
+            document.getElementById('section-5').style.transform = "rotate(180deg)"
             document.getElementById('section-4').style.display = "block"
             document.getElementById('time').innerHTML = 'Waiting for Apponet Player'
         }
@@ -474,7 +474,7 @@ const reJoin = (data) => {
                 document.getElementById('section-2').style.display = "none"
                 document.getElementById('section-3').style.display = "block"
                 document.getElementById('main-board').style.transform = "rotate(180deg)"
-                document.getElementById('leaveButton').style.transform = "rotate(180deg)"
+                document.getElementById('section-5').style.transform = "rotate(180deg)"
                 document.getElementById('section-4').style.display = "block"
                 document.getElementById('time').innerHTML = 'Round Timer Started'
             }
@@ -528,6 +528,7 @@ const reJoin = (data) => {
                 document.getElementById('section-2').style.display = "none"
                 document.getElementById('section-3').style.display = "block"
                 document.getElementById('main-board').style.transform = "rotate(180deg)"
+                document.getElementById('section-5').style.transform = "rotate(180deg)"
                 document.getElementById('section-4').style.display = "block"
                 document.getElementById('time').innerHTML = 'Lock Table'
             }
@@ -599,7 +600,7 @@ const reJoin = (data) => {
                 document.getElementById('section-2').style.display = "none"
                 document.getElementById('section-3').style.display = "block"
                 document.getElementById('main-board').style.transform = "rotate(180deg)"
-                document.getElementById('leaveButton').style.transform = "rotate(180deg)"
+                document.getElementById('section-5').style.transform = "rotate(180deg)"
                 document.getElementById('section-4').style.display = "none"
             }
         }
@@ -661,7 +662,7 @@ const reJoin = (data) => {
                 document.getElementById('section-2').style.display = "none"
                 document.getElementById('section-3').style.display = "block"
                 document.getElementById('main-board').style.transform = "rotate(180deg)"
-                document.getElementById('leaveButton').style.transform = "rotate(180deg)"
+                document.getElementById('section-5').style.transform = "rotate(180deg)"
                 document.getElementById('section-4').style.display = "block"
                 document.getElementById('time').innerHTML = `You Win ${userName}`
                 if (data.tie == true) {

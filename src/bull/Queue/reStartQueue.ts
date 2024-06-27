@@ -45,7 +45,7 @@ const reStartQueue = async (data: any, socket: any) => {
                         await redisDel(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[1].userId}`)
                     } else {
                         if (findTable._id == userTwo.tableId) {
-                            userOne.tableId = ""
+                            userTwo.tableId = ""
                             await redisDel(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[1].userId}`)
                             await redisSet(`${REDIS_EVENT_NAME.USER}:${findTable.playerInfo[1].userId}`, userTwo)
                         }

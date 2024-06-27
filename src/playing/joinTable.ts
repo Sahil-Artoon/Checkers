@@ -255,9 +255,8 @@ const joinTable = async (data: any, socket: any) => {
                             place: 21
                         },
                         { place: 22 },
-                        
                         {
-                            pieceId: 'R-12',
+                            pieceId: 'B-12',
                             place: 23
                         },
                         { place: 24 },
@@ -313,7 +312,7 @@ const joinTable = async (data: any, socket: any) => {
                         },
                         { place: 45 },
                         {
-                            pieceId: "B-12",
+                            pieceId: "R-3",
                             place: 46
                         },
                         { place: 47 },
@@ -358,7 +357,7 @@ const joinTable = async (data: any, socket: any) => {
                         },
                         { place: 63 },
                         {
-                            pieceId: null,
+                            pieceId: "R-12",
                             place: 64
                         }
                     ],
