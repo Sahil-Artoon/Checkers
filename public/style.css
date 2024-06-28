@@ -281,7 +281,7 @@ input[type="submit"]:hover {
 
 @keyframes boxShadowAnimation {
     0% {
-        box-shadow: 0 10px 20px #000;
+        box-shadow: 0 10px 20px #ffffff;
     }
 
     100% {

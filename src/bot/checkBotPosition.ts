@@ -202,116 +202,143 @@ const checkvalidPosition = async (data: any, tableData: any) => {
     try {
         logger.info(`START checkBestPositionIsValidOrNot :::: DATA IS :::: POSITION :::: ${JSON.stringify(data)}`)
         let { position, check, push } = data
-        let bestPositions: any = {
-            7: [{ move: 16 }],
-            10: [{ move: 17 }],
-            12: [{ move: 32 }],
-            26: [{ move: 33 }],
-            39: [{ move: 48 }],
-            42: [{ move: 49 }],
-            55: [{ move: 64 }],
-        }
-        if (bestPositions[position]) {
-            data = {
-                isBestPosition: true,
-                validPosition: false
-            }
-            return data;
-        }
-        let checkValidOrNot: any = [];
-        console.log("type Of check ",typeof(check))
-        if (check !== 0) {
-            console.log("This is inside check!=0")
-            let checkKill: any = {
-                10: [{ check: 19, move: 1 }],
-                12: [{ check: 19, move: 5 }, { check: 21, move: 3 }],
-                14: [{ check: 21, move: 7 }, { check: 23, move: 5 }],
-                19: [{ check: 26, move: 12 }, { check: 28, move: 10 }],
-                21: [{ check: 28, move: 14 }, { check: 30, move: 12 }],
-                23: [{ check: 30, move: 16 }, { check: 32, move: 14 }],
-                26: [{ check: 33, move: 19 }, { check: 35, move: 17 }],
-                28: [{ check: 35, move: 21 }, { check: 37, move: 19 }],
-                30: [{ check: 37, move: 23 }, { check: 39, move: 21 }],
-                35: [{ check: 42, move: 28 }, { check: 44, move: 26 }],
-                37: [{ check: 44, move: 30 }, { check: 46, move: 28 }],
-                39: [{ check: 46, move: 32 }, { check: 48, move: 30 }],
-                42: [{ check: 49, move: 35 }, { check: 51, move: 33 }],
-                44: [{ check: 51, move: 37 }, { check: 53, move: 35 }],
 
-                46: [{ check: 53, move: 39 }, { check: 55, move: 37 }],
-                51: [{ check: 58, move: 44 }, { check: 60, move: 42 }],
-                53: [{ check: 60, move: 46 }, { check: 62, move: 44 }],
-                55: [{ check: 62, move: 48 }, { check: 64, move: 46 }],
+        let checkValidOrNot: any = [];
+        let bestPositions: any = [1, 3, 5, 7, 16, 17, 32, 33, 48, 49, 58, 60, 62, 64];
+
+        for (let i = 0; i < bestPositions.length; i++) {
+            if (bestPositions[i] == push) {
+                data = {
+                    safePlace: true,
+                    result: true
+                }
+                checkValidOrNot.push(data)
             }
-            let currentCheckKillData = checkKill[push]
-            if (currentCheckKillData) {
-                if (currentCheckKillData.length == 1) {
-                    if (tableData[currentCheckKillData[0].check - 1].pieceId !== null) {
-                        if (tableData[currentCheckKillData[0].check - 1].pieceId.split('-')[0] == "R" || tableData[currentCheckKillData[0].check - 1].pieceId == "R-king") {
-                            console.log("checkKill length is 1 and is Valid False when position is :::: ", position, check, push)
-                            checkValidOrNot.push(false)
+        }
+
+        let checkKill: any = {
+            10: [{ check: 19, move: 1 }],
+            12: [{ check: 19, move: 5 }, { check: 21, move: 3 }],
+            14: [{ check: 21, move: 7 }, { check: 23, move: 5 }],
+            19: [{ check: 26, move: 12 }, { check: 28, move: 10 }],
+            21: [{ check: 28, move: 14 }, { check: 30, move: 12 }],
+            23: [{ check: 30, move: 16 }, { check: 32, move: 14 }],
+            26: [{ check: 33, move: 19 }, { check: 35, move: 17 }],
+            28: [{ check: 35, move: 21 }, { check: 37, move: 19 }],
+            30: [{ check: 37, move: 23 }, { check: 39, move: 21 }],
+            35: [{ check: 42, move: 28 }, { check: 44, move: 26 }],
+            37: [{ check: 44, move: 30 }, { check: 46, move: 28 }],
+            39: [{ check: 46, move: 32 }, { check: 48, move: 30 }],
+            42: [{ check: 49, move: 35 }, { check: 51, move: 33 }],
+            44: [{ check: 51, move: 37 }, { check: 53, move: 35 }],
+            46: [{ check: 53, move: 39 }, { check: 55, move: 37 }],
+            51: [{ check: 58, move: 44 }, { check: 60, move: 42 }],
+            53: [{ check: 60, move: 46 }, { check: 62, move: 44 }],
+            55: [{ check: 62, move: 48 }, { check: 64, move: 46 }],
+        }
+        if (!data.safePlace) {
+            if (checkKill[push]) {
+                let currentCheckKillData = checkKill[push]
+                if (currentCheckKillData) {
+                    if (currentCheckKillData.length == 1) {
+                        if (tableData[currentCheckKillData[0].check - 1].pieceId !== null) {
+                            if (tableData[currentCheckKillData[0].check - 1].pieceId.split('-')[0] == "R" || tableData[currentCheckKillData[0].check - 1].pieceId == "R-king") {
+                                console.log("checkKill length is 1 and is Valid False when position is :::: ", position, check, push)
+                                data = {
+                                    safePlace: false,
+                                    result: false
+                                }
+                                checkValidOrNot.push(false)
+                            } else {
+                                console.log("checkKill length is 1 and is Valid true when position is :::: ", position, check, push)
+                                data = {
+                                    safePlace: false,
+                                    result: true
+                                }
+                                checkValidOrNot.push(data)
+                            }
                         } else {
-                            console.log("checkKill length is 1 and is Valid true when position is :::: ", position, check, push)
-                            checkValidOrNot.push(true)
-                        }
-                    }
-                } else {
-                    if (tableData[currentCheckKillData[0].check - 1].pieceId !== null) {
-                        if (tableData[currentCheckKillData[0].check - 1].pieceId.split('-')[0] == "R" || tableData[currentCheckKillData[0].check - 1].pieceId == "R-king") {
-                            if (currentCheckKillData[0].move == check) {
-                                console.log("checkKill length is 2 and this is 0 and is Valid False when position is :::: ", position, check, push)
-                                checkValidOrNot.push(false)
-                            } else {
-                                console.log("checkKill length is 2 and this is 0 and is Valid true when position is :::: ", position, check, push)
-                                checkValidOrNot.push(true)
+                            data = {
+                                safePlace: false,
+                                result: true
                             }
+                            checkValidOrNot.push(data)
                         }
-                    }
-                    if (tableData[currentCheckKillData[1].check - 1].pieceId !== null) {
-                        console.log("This is inside Of length 2 and 1")
-                        if (tableData[currentCheckKillData[1].check - 1].pieceId.split('-')[0] == "R" || tableData[currentCheckKillData[1].check - 1].pieceId == "R-king") {
-                            if (currentCheckKillData[1].move == check) {
-                                console.log("checkKill length is 2 and this is 1. and is Valid False when position is :::: ", position, check, push)
-                                checkValidOrNot.push(false)
-                            } else {
-                                console.log("checkKill length is 2 and this is 1. and is Valid true when position is :::: ", position, check, push)
-                                checkValidOrNot.push(true)
+                    } else {
+                        if (tableData[currentCheckKillData[0].check - 1].pieceId !== null) {
+                            if (tableData[currentCheckKillData[0].check - 1].pieceId.split('-')[0] == "R" || tableData[currentCheckKillData[0].check - 1].pieceId == "R-king") {
+                                if (currentCheckKillData[0].move == check) {
+                                    console.log("checkKill length is 2 and this is 0 and is Valid False when position is :::: ", position, check, push)
+                                    data = {
+                                        safePlace: false,
+                                        result: false
+                                    }
+                                    checkValidOrNot.push(false)
+                                } else {
+                                    console.log("checkKill length is 2 and this is 0 and is Valid true when position is :::: ", position, check, push)
+                                    data = {
+                                        safePlace: false,
+                                        result: true
+                                    }
+                                    checkValidOrNot.push(data)
+                                }
                             }
+                        } else {
+                            data = {
+                                safePlace: false,
+                                result: true
+                            }
+                            checkValidOrNot.push(data)
+                        }
+                        if (tableData[currentCheckKillData[1].check - 1].pieceId !== null) {
+                            console.log("This is inside Of length 2 and 1")
+                            if (tableData[currentCheckKillData[1].check - 1].pieceId.split('-')[0] == "R" || tableData[currentCheckKillData[1].check - 1].pieceId == "R-king") {
+                                if (currentCheckKillData[1].move == check) {
+                                    console.log("checkKill length is 2 and this is 1. and is Valid False when position is :::: ", position, check, push)
+                                    data = {
+                                        safePlace: false,
+                                        result: false
+                                    }
+                                    checkValidOrNot.push(false)
+                                } else {
+                                    console.log("checkKill length is 2 and this is 1. and is Valid true when position is :::: ", position, check, push)
+                                    data = {
+                                        safePlace: false,
+                                        result: true
+                                    }
+                                    checkValidOrNot.push(data)
+                                }
+                            }
+                        } else {
+                            data = {
+                                safePlace: false,
+                                result: true
+                            }
+                            checkValidOrNot.push(data)
                         }
                     }
                 }
             }
         }
-        if (checkValidOrNot.length == 0) {
-            data = {
-                isBestPosition: false,
-                validPosition: true
+
+        if (checkValidOrNot.length > 0) {
+            if (checkValidOrNot.length == 1 && checkValidOrNot[0].safePlace === true) {
+                return true
+            } else if (checkValidOrNot.length == 1 && checkValidOrNot[0].safePlace === false && checkValidOrNot[0].result === true) {
+                return true
+            } else if (checkValidOrNot.length == 1 && checkValidOrNot[0].safePlace === false && checkValidOrNot[0].result === false) {
+                return false
+            } else if (checkValidOrNot.length == 2 && checkValidOrNot[0].safePlace === false && checkValidOrNot[1].result === false) {
+                return false
+            } else if (checkValidOrNot.length == 2 && checkValidOrNot[0].safePlace === false && checkValidOrNot[0].result === true && checkValidOrNot[1].result === false) {
+                return false
+            } else if (checkValidOrNot.length == 2 && checkValidOrNot[0].safePlace === false && checkValidOrNot[0].result === false && checkValidOrNot[1].result === true) {
+                return false
+            } else if (checkValidOrNot.length == 2 && checkValidOrNot[0].safePlace === false && checkValidOrNot[0].result === true && checkValidOrNot[1].result === true) {
+                return true
+            } else if (checkValidOrNot.length == 2 && checkValidOrNot[0].safePlace === false && checkValidOrNot[0].result === false && checkValidOrNot[1].result === false) {
+                return false
             }
-            return data
-        } else if (checkValidOrNot.length == 1 && checkValidOrNot[0] == true) {
-            data = {
-                isBestPosition: false,
-                validPosition: true
-            }
-            return data
-        } else if (checkValidOrNot.length == 1 && checkValidOrNot[0] == false) {
-            data = {
-                isBestPosition: false,
-                validPosition: false
-            }
-            return data
-        } else if (checkValidOrNot[0] == false || checkValidOrNot[1] == false) {
-            data = {
-                isBestPosition: false,
-                validPosition: false
-            }
-            return data
-        } else if (checkValidOrNot[0] == true && checkValidOrNot[1] == true) {
-            data = {
-                isBestPosition: false,
-                validPosition: true
-            }
-            return data
         }
     } catch (error) {
         logger.error(`CATCH_ERROR checkBestPositionIsValidOrNot :::: ${error}`)

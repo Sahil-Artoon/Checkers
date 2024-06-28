@@ -286,7 +286,7 @@ const lockTable = (data) => {
 const turn = (data) => {
     console.log(`turn :::: DATA :::: ${JSON.stringify(data)}`)
     document.getElementById('section-4').style.display = 'none'
-     document.getElementById('leaveButton').style.display = 'block'
+    document.getElementById('leaveButton').style.display = 'block'
     let User = getSession('USER');
     console.log("User", User)
     console.log("UserId", data.userId)
@@ -656,6 +656,24 @@ const reJoin = (data) => {
                 document.getElementById('main-board').style.transform = "rotate(180deg)"
                 document.getElementById('section-5').style.transform = "rotate(180deg)"
                 document.getElementById('section-4').style.display = "none"
+            }
+
+
+            let User = getSession('USER');
+            console.log("User", User)
+            let curretUser = getSession("USER_TABLE")
+            console.log("curretUser", curretUser)
+            if (curretUser.color == "red" && data.table.currentTurnUserId == User._id) {
+                let ele = document.getElementsByClassName('red-piece')
+                for (let i = 0; i < ele.length; i++) {
+                    ele[i].classList.add('currentTurnAnimation')
+                }
+            }
+            if (curretUser.color == "black" && data.table.currentTurnUserId == User._id) {
+                let ele = document.getElementsByClassName('black-piece')
+                for (let i = 0; i < ele.length; i++) {
+                    ele[i].classList.remove('currentTurnAnimation')
+                }
             }
         }
 
